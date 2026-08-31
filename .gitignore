@@ -1,0 +1,26 @@
+# ─────────────────────────────────────────────
+# Yam Web — .gitignore (frontend JS vanilla)
+# ─────────────────────────────────────────────
+
+# Artefacts de build / debug
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+
+# Configuration locale
+.env
+.env.*
+!.env.example
+
+# Dépendances (si un bundler est ajouté un jour)
+node_modules/
+
+# Fichiers système / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appel entrant — Appel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* =========================================================
+       Page d'appel entrant — plein écran, pas de shell
+       ========================================================= */
+    body.call-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .call-ripple {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .call-ripple span {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 2px solid var(--color-accent);
+      opacity: 0;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    .call-ripple span:nth-child(2) { animation-delay: 0.6s; }
+    .call-ripple span:nth-child(3) { animation-delay: 1.2s; }
+    .call-ripple span:nth-child(4) { animation-delay: 1.8s; }
+
+    .call-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .call-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: avatar-bounce 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes avatar-bounce {
+      0%   { transform: scale(1); }
+      100% { transform: scale(1.06); }
+    }
+
+    .call-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .call-label {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .call-type-badge {
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .call-actions {
+      display: flex;
+      gap: 32px;
+      margin-top: 48px;
+    }
+
+    .call-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+    .call-btn:active { transform: scale(0.93); }
+    .call-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .call-btn svg { width: 30px; height: 30px; }
+
+    .call-btn-accept {
+      background: #22C55E;
+      color: #fff;
+      box-shadow: 0 0 24px rgba(34, 197, 94, 0.35);
+      animation: accept-pulse 1.5s ease-in-out infinite;
+    }
+    .call-btn-accept:hover { background: #16A34A; }
+
+    .call-btn-decline {
+      background: var(--color-danger);
+      color: #fff;
+      box-shadow: 0 0 24px rgba(255, 107, 107, 0.35);
+    }
+    .call-btn-decline:hover { background: #EF4444; }
+
+    @keyframes accept-pulse {
+      0%, 100% { box-shadow: 0 0 24px rgba(34, 197, 94, 0.35); }
+      50%      { box-shadow: 0 0 40px rgba(34, 197, 94, 0.55); }
+    }
+
+    .call-action-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 8px;
+    }
+
+    .call-action-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .call-timer {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .call-error {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: var(--color-text-muted);
+    }
+    .call-error a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+
+    /* ── Mode vidéo (appel entrant) ─────────────────────── */
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      display: none;
+      overflow: hidden;
+    }
+    body.video-mode .video-container { display: block; }
+    body.video-mode .call-card { display: none; }
+
+    #remote-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    #local-video {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 120px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: #222;
+      z-index: 5;
+      display: none;
+    }
+
+    .video-topbar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 6;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .video-topbar .v-name {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .video-topbar .v-status {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    .video-controls {
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 6;
+    }
+    .vc-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .vc-btn:hover { background: rgba(255,255,255,0.3); }
+    .vc-btn:active { transform: scale(0.93); }
+    .vc-btn.off { background: var(--color-danger); }
+    .vc-btn.hangup { background: var(--color-danger); width: 64px; height: 64px; }
+    .vc-btn svg { width: 24px; height: 24px; }
+  </style>
+</head>
+<body class="call-screen">
+
+  <div class="video-container" id="video-container">
+    <video id="remote-video" autoplay playsinline></video>
+    <video id="local-video" autoplay playsinline muted></video>
+    <div class="video-topbar">
+      <div id="v-name" class="v-name"></div>
+      <div id="v-status" class="v-status">Appel en cours...</div>
+    </div>
+    <div class="video-controls">
+      <button id="btn-camera-incoming" class="vc-btn" aria-label="Couper la caméra">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 7l-7 5 7 5V7z"/>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+      </button>
+      <button id="btn-hangup-incoming" class="vc-btn hangup" aria-label="Raccrocher">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="call-ripple" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div id="call-content" class="call-card" style="display:none;">
+    <div id="call-avatar" class="call-avatar"></div>
+    <div id="call-name" class="call-name"></div>
+    <div class="call-label">
+      <span>Appel</span>
+      <span id="call-type-badge" class="call-type-badge"></span>
+    </div>
+
+    <div id="call-status" style="color: var(--color-text-muted); font-size: 0.9rem;">Appel entrant...</div>
+
+    <div class="call-actions">
+      <div class="call-action-group">
+        <button id="btn-decline" class="call-btn call-btn-decline" aria-label="Refuser l'appel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+        <span class="call-action-label">Refuser</span>
+      </div>
+      <div class="call-action-group">
+        <button id="btn-accept" class="call-btn call-btn-accept" aria-label="Accepter l'appel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+        </button>
+        <span class="call-action-label">Accepter</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="call-error" class="call-error" style="display:none;">
+    <p>Aucun appel en cours.</p>
+    <p><a href="contacts.html">Retour aux contacts</a></p>
+  </div>
+
+  <div id="call-timer" class="call-timer" style="display:none;">0:00</div>
+
+  <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
+  <script src="../js/push.js"></script>
+  <script src="../js/incoming-call-listener.js"></script>
+  <script src="../js/peer-config.js"></script>
+  <script>
+    // ---- Sonnerie (fichier audio + fallback synthétiseur Web Audio) ----
+    let ringtoneAudio = null;
+    let audioCtx = null;
+    let ringInterval = null;
+
+    function playRingSynth() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.8);
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const osc2 = audioCtx.createOscillator();
+          const gain2 = audioCtx.createGain();
+          osc2.connect(gain2);
+          gain2.connect(audioCtx.destination);
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(520, audioCtx.currentTime);
+          gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+          osc2.start(audioCtx.currentTime);
+          osc2.stop(audioCtx.currentTime + 0.6);
+        }, 200);
+      } catch (_) {}
+    }
+
+    function startRinging() {
+      try {
+        if (!ringtoneAudio) {
+          ringtoneAudio = new Audio("../sounds/ringtone.mp3");
+          ringtoneAudio.loop = true;
+        }
+        const p = ringtoneAudio.play();
+        if (p !== undefined) {
+          p.catch((err) => {
+            console.warn("[incoming] Autoplay audio bloqué, fallback synthé WebAudio:", err);
+            playRingSynth();
+            if (!ringInterval) ringInterval = setInterval(playRingSynth, 2000);
+            const unlock = () => {
+              if (ringtoneAudio) {
+                ringtoneAudio.play().then(() => {
+                  if (ringInterval) clearInterval(ringInterval);
+                  ringInterval = null;
+                }).catch(() => {});
+              }
+              window.removeEventListener("click", unlock);
+              window.removeEventListener("touchstart", unlock);
+            };
+            window.addEventListener("click", unlock);
+            window.addEventListener("touchstart", unlock);
+          });
+        }
+      } catch (_) {
+        playRingSynth();
+        if (!ringInterval) ringInterval = setInterval(playRingSynth, 2000);
+      }
+    }
+
+    function stopRinging() {
+      if (ringtoneAudio) {
+        try {
+          ringtoneAudio.pause();
+          ringtoneAudio.currentTime = 0;
+        } catch (_) {}
+        ringtoneAudio = null;
+      }
+      if (ringInterval) clearInterval(ringInterval);
+      ringInterval = null;
+    }
+
+    // ---- Vibration ----
+    function startVibrating() {
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400, 1000]);
+    }
+    function stopVibrating() {
+      if (navigator.vibrate) navigator.vibrate(0);
+    }
+
+    // ---- WebRTC & Signaling State ----
+    let peerConnection = null;
+    let localStream = null;
+    let callTimer = null;
+    let callSeconds = 0;
+    let isAccepting = false;
+    let isAnswered = false;
+    let pendingOffer = null;
+    let cameraOn = false;
+    const pendingRemoteCandidates = [];
+
+    // ---------------------------------------------------------
+    // Contourne la politique d'autoplay : retente la lecture de
+    // l'audio distant au premier geste utilisateur tant qu'elle
+    // échoue (certains navigateurs bloquent sans interaction).
+    // ---------------------------------------------------------
+    function attachAutoplayUnlock(audio) {
+      const unlockEvents = ["click", "touchstart", "keydown"];
+      const tryPlay = () => {
+        audio.play()
+          .then(() => {
+            console.log("[incoming] 🔊 Audio distant en lecture.");
+            unlockEvents.forEach((e) => window.removeEventListener(e, unlock));
+          })
+          .catch(() => console.warn("[incoming] ⏳ Lecture audio en attente d'un geste utilisateur..."));
+      };
+      const unlock = () => tryPlay();
+      unlockEvents.forEach((e) => window.addEventListener(e, unlock));
+      tryPlay();
+    }
+
+    function sendSignal(type, payload, fromDeviceId, toDeviceId) {
+      console.log(`[incoming] 📤 Envoi signal "${type}" → device ${toDeviceId}`);
+      fetch(API_SIGNAL_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to_device_id: toDeviceId,
+          from_device_id: fromDeviceId,
+          type: type,
+          payload: payload,
+        }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          console.log(`[incoming] ✅ Signal "${type}" transmis par le serveur.`);
+        })
+        .catch((err) => console.error(`[incoming] ❌ Échec envoi signal "${type}":`, err));
+    }
+
+    // Traite l'offre SDP et envoie la réponse
+    async function processOffer(offerPayload, fromDeviceId) {
+      if (!peerConnection || isAnswered) return;
+      if (!fromDeviceId) {
+        console.error("[incoming] ❌ from_device_id de l'appelant inconnu ! Impossible d'envoyer la réponse SDP. " +
+          "Cause probable : le serveur actif ne diffuse pas from_device_id (vieille API type api-engine).");
+        return;
+      }
+      try {
+        const sdpStr = typeof offerPayload === "string" ? offerPayload : (offerPayload?.sdp || "");
+        const offerDesc = new RTCSessionDescription({
+          type: "offer",
+          sdp: sdpNormalise(sdpStr),
+        });
+        await peerConnection.setRemoteDescription(offerDesc);
+        console.log("[incoming] ✅ Offre SDP appliquée.");
+
+        // Dépiler les ICE candidates en attente
+        while (pendingRemoteCandidates.length > 0) {
+          const c = pendingRemoteCandidates.shift();
+          try {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(c));
+          } catch (_) {}
+        }
+
+        // Créer et envoyer la réponse (answer)
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        const myDeviceId = localStorage.getItem("device_id");
+        sendSignal("answer", {
+          sdp: { type: answer.type, sdp: sdpNormalise(answer.sdp) }
+        }, myDeviceId, fromDeviceId);
+        // isAnswered posé APRÈS l'envoi réussi : si createAnswer/sendSignal
+        // échoue, l'offre pourra être retraitée au lieu de bloquer l'appel.
+        isAnswered = true;
+        console.log("[incoming] ✅ Réponse SDP envoyée.");
+      } catch (err) {
+        console.error("[incoming] Erreur traitement offre SDP:", err);
+      }
+    }
+
+    async function acceptCall(data) {
+      if (isAccepting) return;
+      isAccepting = true;
+      const myDeviceId = localStorage.getItem("device_id");
+      const fromDeviceId = data.fromDevice;
+      const isVideo = data.type === "video";
+
+      // 1. Obtenir le micro (et la caméra si appel vidéo)
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: isVideo,
+        });
+      } catch (err) {
+        console.error("[incoming] Micro refusé:", err);
+        declineCall();
+        return;
+      }
+
+      // Afficher la vidéo locale (PIP) si appel vidéo
+      if (isVideo) {
+        const localVideo = document.getElementById("local-video");
+        if (localVideo) {
+          localVideo.srcObject = localStream;
+          localVideo.style.display = "block";
+        }
+      }
+
+      // 2. Créer la PeerConnection
+      peerConnection = new RTCPeerConnection(getIceServers());
+
+      // Ajouter les pistes locales
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      // 🔊 RECEPTION DE LA VOIX/VIDEO DISTANTE (CRITIQUE)
+      peerConnection.ontrack = (event) => {
+        console.log("[incoming] 📡 Piste distante reçue !", event.track.kind, event.track.readyState);
+        if (event.track.kind === "video") {
+          const remoteVideo = document.getElementById("remote-video");
+          if (remoteVideo) {
+            if (event.streams && event.streams[0]) {
+              remoteVideo.srcObject = event.streams[0];
+            } else {
+              remoteVideo.srcObject = new MediaStream([event.track]);
+            }
+            remoteVideo.style.display = "block";
+            document.body.classList.add("video-mode");
+          }
+        } else {
+          let remoteAudio = document.getElementById("remote-audio");
+          if (!remoteAudio) {
+            remoteAudio = document.createElement("audio");
+            remoteAudio.id = "remote-audio";
+            remoteAudio.autoplay = true;
+            remoteAudio.playsInline = true;
+            document.body.appendChild(remoteAudio);
+          }
+          if (event.streams && event.streams[0]) {
+            remoteAudio.srcObject = event.streams[0];
+          } else {
+            remoteAudio.srcObject = new MediaStream([event.track]);
+          }
+          attachAutoplayUnlock(remoteAudio);
+        }
+      };
+
+      // ICE candidates locaux → envoyés au caller
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          console.log("[incoming] 🧊 Candidat local:", event.candidate.type,
+            event.candidate.address || "", "| protocole:", event.candidate.protocol);
+          sendSignal("candidate", {
+            candidate: event.candidate.toJSON(),
+          }, myDeviceId, fromDeviceId);
+        } else {
+          console.log("[incoming] 🧊 Rassemblement des candidats terminé.");
+        }
+      };
+
+      // Suivi du rassemblement ICE (diagnostic réseau)
+      peerConnection.onicegatheringstatechange = () => {
+        console.log("[incoming] ❄️ ICE gathering:", peerConnection.iceGatheringState);
+      };
+
+      // État de la connexion WebRTC
+      peerConnection.onconnectionstatechange = () => {
+        const state = peerConnection.connectionState;
+        console.log("[incoming] connectionState:", state, "| iceConnectionState:", peerConnection.iceConnectionState);
+        if (state === "connected") {
+          document.getElementById("call-status").textContent = "Appel en cours...";
+          const vStatus = document.getElementById("v-status");
+          if (vStatus) vStatus.textContent = "Appel en cours...";
+          startCallTimer();
+        } else if (state === "disconnected" || state === "failed" || state === "closed") {
+          endCall("Appel terminé.");
+        }
+      };
+
+      // Si l'offre était déjà bufferisée pendant la sonnerie : la traiter immédiatement !
+      if (pendingOffer) {
+        await processOffer(pendingOffer, fromDeviceId);
+      } else {
+        // Sinon : récupérer l'offre différée stockée par le serveur (cas où
+        // l'appelé n'était pas connecté au WebSocket au moment de l'émission,
+        // ex. onglet fermé / notification push).
+        await fetchDeferredOffer(data);
+      }
+    }
+
+    // Récupère l'offre SDP différée depuis le serveur (GET /call/{id}/offer)
+    // quand elle n'a pas été reçue en temps réel pendant la sonnerie.
+    async function fetchDeferredOffer(data) {
+      const callId = data.callId || sessionStorage.getItem("incoming_call_id");
+      const myDeviceId = localStorage.getItem("device_id");
+      if (!callId || !myDeviceId) {
+        console.error("[incoming] Offre différée impossible : call_id ou device_id manquant");
+        endCall("Appel terminé.");
+        return;
+      }
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/call/${encodeURIComponent(callId)}/offer?device_id=${encodeURIComponent(myDeviceId)}`,
+          { cache: "no-store" }
+        );
+        if (res.status === 200) {
+          const offerData = await res.json();
+          console.log("[incoming] ✅ Offre différée récupérée (HTTP 200)");
+          await processOffer(offerData.payload, offerData.from_device_id);
+        } else {
+          console.error("[incoming] Offre différée indisponible (HTTP " + res.status + ")");
+          endCall("Appel terminé.");
+        }
+      } catch (err) {
+        console.error("[incoming] Erreur récupération offre différée:", err);
+        endCall("Appel terminé.");
+      }
+    }
+
+    function startCallTimer() {
+      if (callTimer) return;
+      callSeconds = 0;
+      callTimer = setInterval(() => {
+        callSeconds++;
+        const m = Math.floor(callSeconds / 60);
+        const s = String(callSeconds % 60).padStart(2, "0");
+        document.getElementById("call-timer").textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function getCallData() {
+      return {
+        callId:     sessionStorage.getItem("incoming_call_id"),
+        from:       sessionStorage.getItem("incoming_call_from") || "Inconnu",
+        fromDevice: sessionStorage.getItem("incoming_call_from_device_id"),
+        type:       sessionStorage.getItem("incoming_call_type") || "audio",
+      };
+    }
+
+    function declineCall() {
+      const myDeviceId = localStorage.getItem("device_id");
+      const fromDeviceId = sessionStorage.getItem("incoming_call_from_device_id");
+      if (myDeviceId && fromDeviceId) {
+        sendSignal("bye", {}, myDeviceId, fromDeviceId);
+      }
+      cleanup();
+      sessionStorage.removeItem("incoming_call_id");
+      sessionStorage.removeItem("incoming_call_from");
+      sessionStorage.removeItem("incoming_call_from_device_id");
+      sessionStorage.removeItem("incoming_call_type");
+      window.location.href = "contacts.html";
+    }
+
+    function endCall(message) {
+      cleanup();
+      document.getElementById("call-content").style.display = "none";
+      document.getElementById("call-status").textContent = message || "Appel terminé.";
+      setTimeout(() => { window.location.href = "contacts.html"; }, 1500);
+    }
+
+    function toggleCamera() {
+      if (!localStream) return;
+      cameraOn = !cameraOn;
+      localStream.getVideoTracks().forEach((t) => {
+        t.enabled = cameraOn;
+      });
+      const btn = document.getElementById("btn-camera-incoming");
+      if (btn) {
+        btn.classList.toggle("off", !cameraOn);
+        btn.setAttribute("aria-label", cameraOn ? "Couper la caméra" : "Activer la caméra");
+      }
+    }
+
+    function cleanup() {
+      stopRinging();
+      stopVibrating();
+      if (callTimer) clearInterval(callTimer);
+      callTimer = null;
+      if (peerConnection) {
+        try { peerConnection.close(); } catch (_) {}
+        peerConnection = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+      const remoteAudio = document.getElementById("remote-audio");
+      if (remoteAudio) {
+        remoteAudio.pause();
+        remoteAudio.remove();
+      }
+      const localVideo = document.getElementById("local-video");
+      if (localVideo) {
+        localVideo.srcObject = null;
+        localVideo.style.display = "none";
+      }
+      const remoteVideo = document.getElementById("remote-video");
+      if (remoteVideo) {
+        remoteVideo.srcObject = null;
+        remoteVideo.style.display = "none";
+      }
+      document.body.classList.remove("video-mode");
+      // Réinitialise l'état pour une éventuelle réutilisation de la page
+      // (bouton retour navigateur) : évite un état corrompu.
+      isAccepting = false;
+      isAnswered = false;
+      pendingOffer = null;
+      pendingRemoteCandidates = [];
+      cameraOn = false;
+    }
+
+    // ---- Initialisation ----
+    // Message du Service Worker (clic sur notification Web Push) :
+    // stocke les infos de l'appel avant que la page ne les lise.
+    navigator.serviceWorker?.addEventListener("message", (event) => {
+      const msg = event.data;
+      if (msg && msg.type === "YAM_INCOMING_CALL") {
+        sessionStorage.setItem("incoming_call_id", msg.call_id || "");
+        sessionStorage.setItem("incoming_call_from", msg.from_username || "Inconnu");
+        sessionStorage.setItem("incoming_call_from_device_id", msg.from_device_id || "");
+        sessionStorage.setItem("incoming_call_type", msg.call_type || "audio");
+        console.log("[incoming] 📥 Données d'appel reçues du Service Worker");
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Attend la config runtime (Reverb/TURN) avant de créer le client
+      // Pusher : sinon on se connecte au mauvais hôte et aucun signal
+      // (offre SDP, candidats) n'est reçu → « décrocher » ne fait rien.
+      if (window.__runtimeConfigReady) {
+        await window.__runtimeConfigReady;
+      }
+      console.log("[incoming] 🌐 Config réseau:", JSON.stringify(hostConfig));
+      const data = getCallData();
+      const contentEl = document.getElementById("call-content");
+      const errorEl   = document.getElementById("call-error");
+      const timerEl   = document.getElementById("call-timer");
+
+      if (!data.callId) {
+        errorEl.style.display = "block";
+        return;
+      }
+
+      const myDeviceId = localStorage.getItem("device_id");
+      console.log("[incoming] 🆔 Mon device_id:", myDeviceId, "| Appelant:", data.from, "(", data.fromDevice, ")");
+
+      // Diagnostic critique : sans from_device_id, la réponse SDP ne
+      // pourra jamais être renvoyée à l'appelant (aucune voix possible).
+      if (!data.fromDevice) {
+        console.error("[incoming] ❌ from_device_id manquant dans l'appel entrant ! " +
+          "Le serveur actif ne diffuse pas from_device_id (vieille API type api-engine ?).");
+      }
+
+      // UI Setup
+      document.getElementById("call-avatar").textContent = (data.from || "?").charAt(0).toUpperCase();
+      document.getElementById("call-name").textContent = data.from;
+      document.getElementById("call-type-badge").textContent = data.type === "video" ? "Vidéo" : "Audio";
+      document.getElementById("call-status").textContent = "Appel entrant...";
+      const vNameEl = document.getElementById("v-name");
+      if (vNameEl) vNameEl.textContent = data.from;
+
+      contentEl.style.display = "flex";
+      timerEl.style.display = "block";
+
+      startRinging();
+      startVibrating();
+
+      // ÉCOUTER LE SIGNALING DÈS LA SONNERIE (pour ne pas rater l'offre SDP !)
+      const pusher = new Pusher(REVERB_APP_KEY, {
+        wsHost: hostConfig.wsHost,
+        wsPort: hostConfig.wsPort,
+        wssPort: hostConfig.wsPort,
+        forceTLS: hostConfig.forceTLS,
+        cluster: "",
+      });
+
+      const channel = pusher.subscribe("device." + myDeviceId);
+
+      channel.bind("call-signal", async (signal) => {
+        if (signal.from_device_id === myDeviceId) {
+          console.warn(`[incoming] ⚠️ Signal "${signal.type}" ignoré (émis par mon propre device_id).`);
+          return;
+        }
+        console.log("[incoming] 📥 Signal reçu pendant sonnerie/appel:", signal.type, "| de:", signal.from_device_id);
+
+        if (signal.type === "offer") {
+          pendingOffer = signal.payload?.sdp;
+          console.log("[incoming] Offre SDP bufferisée (longueur:",
+            typeof pendingOffer === "string" ? pendingOffer.length : JSON.stringify(pendingOffer)?.length, ").");
+          if (isAccepting && peerConnection && !isAnswered) {
+            await processOffer(pendingOffer, data.fromDevice);
+          }
+        } else if (signal.type === "candidate") {
+          const cand = signal.payload?.candidate;
+          if (!cand) return;
+          if (peerConnection && isAnswered && peerConnection.remoteDescription) {
+            try {
+              await peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+              console.log("[incoming] 🧊 Candidat distant ajouté:", cand.type || "?");
+            } catch (e) {
+              console.warn("[incoming] ⚠️ Candidat distant rejeté:", e.message);
+            }
+          } else {
+            console.log("[incoming] 🧊 Candidat distant mis en attente.");
+            pendingRemoteCandidates.push(cand);
+          }
+        } else if (signal.type === "bye") {
+          console.log("[incoming] 📴 L'appelant a raccroché.");
+          stopRinging();
+          stopVibrating();
+          cleanup();
+          window.location.href = "contacts.html";
+        }
+      });
+
+      let seconds = 0;
+      const timerInterval = setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60);
+        const s = String(seconds % 60).padStart(2, "0");
+        timerEl.textContent = `${m}:${s}`;
+      }, 1000);
+
+      const autoDecline = setTimeout(() => declineCall(), 45000);
+
+      document.getElementById("btn-accept").addEventListener("click", () => {
+        // Bloque le double-clic : deux acceptCall() concurrents feraient un
+        // double setRemoteDescription → appel tué.
+        document.getElementById("btn-accept").disabled = true;
+        clearTimeout(autoDecline);
+        clearInterval(timerInterval);
+        stopRinging();
+        stopVibrating();
+        document.getElementById("call-status").textContent = "Connexion...";
+        acceptCall(data);
+      });
+
+      document.getElementById("btn-decline").addEventListener("click", () => {
+        clearTimeout(autoDecline);
+        clearInterval(timerInterval);
+        declineCall();
+      });
+
+      // Boutons du mode vidéo (actifs après acceptation d'un appel vidéo)
+      const camBtn = document.getElementById("btn-camera-incoming");
+      if (camBtn) {
+        camBtn.addEventListener("click", toggleCamera);
+        if (data.type !== "video") camBtn.style.display = "none";
+      }
+      const hangupVideoBtn = document.getElementById("btn-hangup-incoming");
+      if (hangupVideoBtn) {
+        hangupVideoBtn.addEventListener("click", () => {
+          clearTimeout(autoDecline);
+          clearInterval(timerInterval);
+          // Envoyer un bye pour notifier proprement l'appelant (sinon il ne
+          // détecte la fin que via onconnectionstatechange, moins fiable).
+          const myDeviceId = localStorage.getItem("device_id");
+          const fromDeviceId = sessionStorage.getItem("incoming_call_from_device_id");
+          if (myDeviceId && fromDeviceId) {
+            sendSignal("bye", {}, myDeviceId, fromDeviceId);
+          }
+          endCall("Appel terminé.");
+        });
+      }
+    });
+  </script>
+</body>
+</html>

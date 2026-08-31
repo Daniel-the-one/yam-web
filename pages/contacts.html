@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacts — Appel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="app-body">
+  <div class="app-shell">
+
+    <header class="app-header">
+      <span class="app-header-title">Contacts</span>
+      <nav class="app-header-actions">
+        <a href="dial.html" class="icon-btn" aria-label="Composer" title="Composer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+          </svg>
+        </a>
+        <a href="history.html" class="icon-btn" aria-label="Historique" title="Historique">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>
+          </svg>
+        </a>
+      </nav>
+    </header>
+
+    <div class="search-bar">
+      <input type="search" id="contact-search" placeholder="Rechercher un contact">
+    </div>
+
+    <!-- Affiché uniquement si l'appel à l'API échoue -->
+    <div id="contacts-error" class="form-error" role="alert"></div>
+
+    <!-- Affiché uniquement si la liste est vide -->
+    <p id="contacts-empty" class="empty-state" hidden>Aucun contact pour l'instant.</p>
+
+    <!-- Rempli dynamiquement par contacts.js -->
+    <ul id="contacts-list" class="contact-list"></ul>
+
+  </div>
+
+  <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
+  <script src="../js/push.js"></script>
+  <script src="../js/incoming-call-listener.js"></script>
+  <script src="../js/contacts.js"></script>
+</body>
+</html>

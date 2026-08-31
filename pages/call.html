@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appel — Appel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body.call-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .call-ripple {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .call-ripple span {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 2px solid var(--color-accent);
+      opacity: 0;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    .call-ripple span:nth-child(2) { animation-delay: 0.6s; }
+    .call-ripple span:nth-child(3) { animation-delay: 1.2s; }
+
+    .call-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .call-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .call-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    #call-status {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
+    #call-timer {
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .call-actions {
+      margin-top: 48px;
+    }
+
+    .call-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-danger);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(255, 107, 107, 0.35);
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+    .call-btn:hover { background: #EF4444; }
+    .call-btn:active { transform: scale(0.93); }
+    .call-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .call-btn svg { width: 30px; height: 30px; }
+
+    .call-action-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* ── Mode vidéo ─────────────────────────────────────── */
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      display: none;
+      overflow: hidden;
+    }
+    body.video-mode .video-container { display: block; }
+    body.video-mode .call-card { display: none; }
+
+    #remote-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    #local-video {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 120px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: #222;
+      z-index: 5;
+      display: none;
+    }
+
+    .video-topbar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 6;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .video-topbar .v-name {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .video-topbar .v-status {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    .video-controls {
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 6;
+    }
+    .vc-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .vc-btn:hover { background: rgba(255,255,255,0.3); }
+    .vc-btn:active { transform: scale(0.93); }
+    .vc-btn.off { background: var(--color-danger); }
+    .vc-btn.hangup { background: var(--color-danger); width: 64px; height: 64px; }
+    .vc-btn svg { width: 24px; height: 24px; }
+  </style>
+</head>
+<body class="call-screen">
+
+  <div class="video-container" id="video-container">
+    <video id="remote-video" autoplay playsinline></video>
+    <video id="local-video" autoplay playsinline muted></video>
+    <div class="video-topbar">
+      <div id="v-name" class="v-name">Appel...</div>
+      <div id="v-status" class="v-status">Connexion...</div>
+    </div>
+    <div class="video-controls">
+      <button id="btn-camera" class="vc-btn" aria-label="Couper la caméra" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 7l-7 5 7 5V7z"/>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+      </button>
+      <button id="btn-hangup-video" class="vc-btn hangup" aria-label="Raccrocher">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="call-ripple" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="call-card">
+    <div id="call-avatar" class="call-avatar"></div>
+    <div id="call-name" class="call-name">Appel...</div>
+    <div id="call-status">Connexion...</div>
+    <div id="call-timer">0:00</div>
+
+    <div class="call-actions" style="text-align:center;">
+      <button id="btn-hangup" class="call-btn" aria-label="Raccrocher">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+      <span class="call-action-label">Raccrocher</span>
+    </div>
+  </div>
+
+  <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
+  <script src="../js/push.js"></script>
+  <script src="../js/incoming-call-listener.js"></script>
+  <script src="../js/peer-config.js"></script>
+  <script src="../js/call.js"></script>
+</body>
+</html>
