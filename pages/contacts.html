@@ -24,6 +24,13 @@
             <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>
           </svg>
         </a>
+        <button id="btn-logout" class="icon-btn" aria-label="Se déconnecter" title="Se déconnecter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
       </nav>
     </header>
 
@@ -45,6 +52,13 @@
   <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
   <script src="../js/push.js"></script>
   <script src="../js/incoming-call-listener.js"></script>
+  <script src="../js/auth.js"></script>
   <script src="../js/contacts.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("btn-logout");
+      if (btn) btn.addEventListener("click", () => logout());
+    });
+  </script>
 </body>
 </html>

@@ -31,8 +31,16 @@
 
       <form id="register-form" novalidate>
         <div class="field">
-          <label for="username">Nom d'utilisateur</label>
-          <input type="text" id="username" name="username" autocomplete="username" required>
+          <label for="name">Nom complet</label>
+          <input type="text" id="name" name="name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="phone_number">Numéro de téléphone</label>
+          <input type="tel" id="phone_number" name="phone_number" autocomplete="tel" placeholder="+33 6 12 34 56 78" pattern="[\+]?[0-9\s\-]{7,30}" required>
+        </div>
+        <div class="field">
+          <label for="username">Nom d'utilisateur (optionnel)</label>
+          <input type="text" id="username" name="username" autocomplete="username">
         </div>
         <div class="field">
           <label for="password">Mot de passe</label>

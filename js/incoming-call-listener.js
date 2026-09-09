@@ -1,9 +1,10 @@
 // =========================================================
 // incoming-call-listener.js — Écoute les appels entrants en temps réel
-// via Laravel Reverb (compatible avec le protocole Pusher)
+// via Pusher.com (SaaS) — le backend Laravel diffuse via le driver pusher.
 // =========================================================
 
-let REVERB_APP_KEY = "local";
+let PUSHER_APP_KEY = "local";
+let PUSHER_CLUSTER = "eu";
 
 function getHostConfig() {
   const host = window.location.hostname || "192.168.1.80";
@@ -14,33 +15,24 @@ function getHostConfig() {
     return {
       host: host,
       apiBase: `http://${host}:8000/api/v1`,
-      wsHost: host,
-      wsPort: 8080,
-      forceTLS: false,
-      transports: ["ws", "wss"]
     };
   }
 
   // Tunnel HTTPS (cloudflared) : l'API et le client sont servis depuis le
-  // même hôte ; le host WebSocket est fourni par l'endpoint /config.
+  // même hôte.
   if (isTunnel) {
     return {
       host: host,
       apiBase: `${window.location.protocol}//${host}/api/v1`,
-      wsHost: host,
-      wsPort: 443,
-      forceTLS: true,
-      transports: ["ws", "wss"]
     };
   }
 
+  // Déploiement générique : l'API et le client sont servis depuis le même
+  // hôte (Railway, tunnel, VPS...). On dérive l'URL de l'hôte courant au
+  // lieu d'un domaine codé en dur.
   return {
-    host: "web-production-6a2e0.up.railway.app",
-    apiBase: "https://web-production-6a2e0.up.railway.app/api/v1",
-    wsHost: "web-production-6a2e0.up.railway.app",
-    wsPort: 443,
-    forceTLS: true,
-    transports: ["ws", "wss"]
+    host: window.location.hostname,
+    apiBase: `${window.location.protocol}//${window.location.host}/api/v1`,
   };
 }
 
@@ -57,29 +49,8 @@ async function hydrateRuntimeConfig() {
     if (!res.ok) return;
     const cfg = await res.json();
 
-    if (cfg.reverb?.app_key) REVERB_APP_KEY = cfg.reverb.app_key;
-    if (cfg.reverb?.host) {
-      const scheme = cfg.reverb.scheme === "https" ? "https" : "http";
-      const isHttps = scheme === "https";
-      const httpPort = window.location.port ? `:${window.location.port}` : (isHttps ? "" : ":8000");
-      hostConfig = {
-        host: cfg.reverb.host,
-        apiBase: `${scheme}://${cfg.reverb.host}${httpPort}/api/v1`,
-        wsHost: cfg.reverb.host,
-        wsPort: isHttps ? 443 : (cfg.reverb.port || 6001),
-        forceTLS: isHttps,
-        // ⚠️ JAMAIS ["wss"] seul : le SDK Pusher échoue immédiatement
-        // (initialized → failed) quand enabledTransports est restreint à wss.
-        transports: ["ws", "wss"],
-      };
-      // Met à jour les constantes de base pour que les fetch (ring, signal,
-      // offer) utilisent la config runtime et non la config par défaut.
-      SERVER_HOST = hostConfig.host;
-      API_BASE_URL = hostConfig.apiBase;
-      API_CONFIG_URL = `${API_BASE_URL}/config`;
-      API_RING_URL = `${API_BASE_URL}/call/ring`;
-      API_SIGNAL_URL = `${API_BASE_URL}/call/signal`;
-    }
+    if (cfg.pusher?.app_key) PUSHER_APP_KEY = cfg.pusher.app_key;
+    if (cfg.pusher?.cluster) PUSHER_CLUSTER = cfg.pusher.cluster;
 
     if (cfg.turn?.url) {
       window.__TURN_CONFIG__ = {
@@ -98,11 +69,19 @@ async function hydrateRuntimeConfig() {
 // call.html) doivent l'attendre pour ne pas se connecter au mauvais hôte.
 window.__runtimeConfigReady = hydrateRuntimeConfig();
 
-// Garantir que device_id existe immédiatement
-let currentDeviceId = localStorage.getItem("device_id");
+// Garantir que device_id existe immédiatement.
+// Utilise la clé `yam_device_id` (cohérente avec le SPA spa-*.js), avec
+// migration depuis l'ancienne clé `device_id`.
+let currentDeviceId = localStorage.getItem("yam_device_id");
 if (!currentDeviceId) {
-  currentDeviceId = "device-" + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("device_id", currentDeviceId);
+  currentDeviceId = localStorage.getItem("device_id");
+  if (currentDeviceId) {
+    localStorage.setItem("yam_device_id", currentDeviceId);
+    localStorage.removeItem("device_id");
+  } else {
+    currentDeviceId = "device-" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("yam_device_id", currentDeviceId);
+  }
 }
 
 async function registerCurrentDevice() {
@@ -144,17 +123,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                      window.location.pathname.endsWith("incoming-call.html");
   if (isCallPage) return;
 
+  // Guard d'authentification : sans compte connecté, on ne peut pas recevoir
+  // d'appels (le backend route les appels vers les appareils d'un utilisateur).
+  if (!localStorage.getItem("auth_token")) {
+    console.warn("[incoming-call] Pas de session (auth_token absent) — écoute des appels entrants désactivée.");
+    return;
+  }
+
   if (typeof Pusher === "undefined") {
     console.warn("[incoming-call] Pusher JS n'est pas chargé");
     return;
   }
 
-  const pusher = new Pusher(REVERB_APP_KEY, {
-    wsHost: hostConfig.wsHost,
-    wsPort: hostConfig.wsPort,
-    wssPort: hostConfig.wsPort,
-    forceTLS: hostConfig.forceTLS,
-    cluster: "",
+  const pusher = new Pusher(PUSHER_APP_KEY, {
+    cluster: PUSHER_CLUSTER,
+    forceTLS: true,
   });
 
   pusher.connection.bind("state_change", (states) => {

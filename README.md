@@ -16,12 +16,24 @@ en temps réel basée sur **WebRTC**, avec signalisation via **Reverb (WebSocket
 
 | Fichier | Rôle |
 |---------|------|
-| `index.html` | Application SPA (contacts, historique, appel intégré) |
+| `index.html` | Structure et interface de la SPA ; charge les modules `spa-*.js` |
+| `js/spa-core.js` | État partagé, configuration locale et références DOM |
+| `js/spa-auth.js` | Inscription, connexion, session Sanctum et déconnexion |
+| `js/spa-network.js` | Configuration runtime, Reverb/Pusher et état réseau |
+| `js/spa-calls.js` | Appels entrants/sortants, WebRTC et signaling |
+| `js/spa-contacts.js` | Contacts, recherche utilisateurs, historique et interactions UI |
+| `js/spa-push.js` | Enregistrement FCM/Web Push |
+| `js/spa-bootstrap.js` | Démarrage contrôlé de la SPA |
 | `pages/` | Version multi-pages (login, contacts, dial, call, incoming-call…) |
 | `js/call.js` | Logique WebRTC de l'appel sortant |
 | `js/push.js` | Notifications push FCM (Service Worker) |
 | `js/peer-config.js` | Configuration ICE (STUN/TURN) |
 | `sw.js` | Service Worker (push + cache) |
+
+Les modules SPA utilisent volontairement des scripts classiques (sans build
+Node) afin de rester compatibles avec le déploiement statique actuel. Leur
+ordre de chargement dans `index.html` est significatif : `core`, `auth`,
+`network`, `calls`, `contacts`, `push`, puis `bootstrap`.
 
 ## Configuration
 

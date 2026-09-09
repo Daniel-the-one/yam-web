@@ -444,9 +444,400 @@
       color: var(--text-muted);
       cursor: pointer;
     }
+
+    /* ── Écran d'authentification ─────────────────────── */
+    #auth-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: var(--bg-page);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #auth-screen.hidden { display: none; }
+    .auth-box {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+    .auth-box h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .auth-box .auth-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .auth-box .field { margin-bottom: 14px; }
+    .auth-box label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .auth-box input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-family: var(--font-ui);
+    }
+    .auth-box input:focus { outline: none; border-color: var(--accent); }
+    .auth-box .btn-primary { width: 100%; margin-top: 6px; }
+    .auth-error {
+      display: none;
+      background: #FEF2F2;
+      color: var(--danger);
+      border: 1px solid #FECACA;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      margin-bottom: 14px;
+    }
+    .auth-error.visible { display: block; }
+    .auth-toggle {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .auth-toggle a { color: var(--accent); font-weight: 600; cursor: pointer; }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-logout:hover { background: rgba(0,0,0,0.05); }
+
+    /* ── Résultats de recherche ─────────────────────── */
+    .search-results {
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: none;
+    }
+    .search-results.visible { display: block; }
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: rgba(0,0,0,0.03); }
+    .search-result-item .sr-info { min-width: 0; }
+    .search-result-item .sr-name { font-weight: 600; font-size: 0.9rem; }
+    .search-result-item .sr-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .search-result-item .sr-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .search-empty {
+      padding: 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* ── Salle de réunion desktop (inspirée Meet / Zoom) ───────────── */
+    :root {
+      --meet-bg: #202124;
+      --meet-surface: #292a2d;
+      --meet-surface-hover: #35363a;
+      --meet-border: #3c4043;
+      --meet-text: #f1f3f4;
+      --meet-muted: #bdc1c6;
+      --meet-blue: #8ab4f8;
+    }
+
+    body {
+      background: var(--meet-bg);
+      color: var(--meet-text);
+      min-width: 320px;
+    }
+    .app-container {
+      width: min(100%, 1600px);
+      max-width: none;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: var(--meet-bg);
+      box-shadow: none;
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+      grid-template-rows: 72px minmax(0, 1fr);
+    }
+    header {
+      grid-column: 1 / -1;
+      padding: 0 28px;
+      background: var(--meet-surface);
+      border-bottom: 1px solid var(--meet-border);
+    }
+    .brand { color: var(--meet-text); font-size: 1.35rem; letter-spacing: -0.03em; }
+    .brand::before {
+      content: "";
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      margin-right: 9px;
+      border-radius: 4px;
+      background: #8ab4f8;
+      box-shadow: 10px 0 0 #ea4335, 0 10px 0 #34a853, 10px 10px 0 #fbbc04;
+      transform: translateY(-3px) scale(.55);
+    }
+    .status-badge, .btn-logout {
+      background: #303134;
+      border-color: #4b4e53;
+      color: var(--meet-muted);
+    }
+    .btn-icon { color: var(--meet-muted); }
+    .btn-icon:hover { background: var(--meet-surface-hover); color: var(--meet-text); }
+
+    nav.bottom-nav {
+      position: static;
+      grid-column: 1;
+      grid-row: 2;
+      width: auto;
+      max-width: none;
+      height: auto;
+      padding: 20px 12px;
+      background: var(--meet-surface);
+      border: 0;
+      border-right: 1px solid var(--meet-border);
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .nav-item {
+      flex: 0 0 auto;
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border-radius: 8px;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 14px;
+      color: var(--meet-muted);
+      text-align: left;
+    }
+    .nav-item:hover { background: var(--meet-surface-hover); color: var(--meet-text); }
+    .nav-item.active { background: #394457; color: var(--meet-blue); }
+    .nav-item svg { width: 20px; height: 20px; }
+
+    .content-area {
+      grid-column: 2;
+      grid-row: 2;
+      min-width: 0;
+      padding: clamp(26px, 4vw, 56px);
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at 75% 0%, rgba(138,180,248,.09), transparent 34rem),
+        var(--meet-bg);
+    }
+    .tab-pane { max-width: 1080px; margin: 0 auto; }
+    .tab-pane.active { animation: pane-in .2s ease-out; }
+    @keyframes pane-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .section-title { color: var(--meet-muted); font-size: .72rem; margin: 28px 0 11px; }
+    #tab-home .section-title:first-child { margin-top: 0; }
+    .card, .item-card {
+      background: var(--meet-surface);
+      border-color: var(--meet-border);
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.16);
+    }
+    #tab-home .card { max-width: 720px; }
+    .device-id, .item-name { color: var(--meet-text); }
+    .device-name, .item-sub { color: var(--meet-muted); }
+    input[type="text"], .auth-box input {
+      background: #303134;
+      border-color: #5f6368;
+      color: var(--meet-text);
+    }
+    input[type="text"]::placeholder { color: #aeb1b5; }
+    .btn-primary { background: #8ab4f8; color: #202124; border-radius: 999px; width: auto; min-width: 150px; }
+    .btn-primary:hover { background: #aecbfa; }
+    .btn-apk { background: #303134; border-color: #5f6368; color: var(--meet-blue); max-width: 420px; }
+    .btn-apk:hover { background: var(--meet-surface-hover); }
+    .search-results, .search-result-item { border-color: var(--meet-border); }
+    .search-result-item:hover { background: var(--meet-surface-hover); }
+
+    /* Les deux vues d'appel deviennent une véritable salle de réunion. */
+    .call-overlay {
+      z-index: 100;
+      background: var(--meet-bg);
+      padding: 32px 42px 110px;
+      justify-content: center;
+    }
+    .call-overlay.active { display: flex; }
+    .call-overlay::before {
+      content: "Yam meeting";
+      position: absolute;
+      top: 27px;
+      left: 34px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      font-size: 1.1rem;
+      color: var(--meet-text);
+    }
+    .call-overlay::after {
+      content: "Sécurisé · WebRTC";
+      position: absolute;
+      top: 31px;
+      right: 34px;
+      color: var(--meet-muted);
+      font-size: .78rem;
+    }
+    .call-title { color: var(--meet-muted); margin-bottom: 7px; }
+    .call-peer-name { font-size: clamp(1.25rem, 2vw, 1.7rem); }
+    .call-peer-id { color: var(--meet-muted); }
+    .pulse-container { width: 210px; height: 210px; }
+    .avatar-circle { width: 124px; height: 124px; background: #5f6368; }
+    .call-timer { margin: 8px 0 14px; font-size: 1.1rem; }
+    .call-buttons-row {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      padding: 10px 14px;
+      gap: 14px;
+      border-radius: 999px;
+      background: rgba(48,49,52,.94);
+      border: 1px solid #4b4e53;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+      z-index: 8;
+    }
+    .btn-circle.control { width: 50px; height: 50px; background: #4a4d52; }
+    .btn-circle.control:hover { background: #5f6368; }
+    .btn-circle.hangup { background: #ea4335; box-shadow: none; }
+    .btn-circle.accept { background: #34a853; box-shadow: none; }
+    .video-container { inset: 82px 34px 106px; border-radius: 18px; }
+    #remote-video { border-radius: 18px; }
+    #local-video {
+      top: 18px;
+      right: 18px;
+      width: clamp(150px, 18vw, 250px);
+      height: auto;
+      aspect-ratio: 16 / 10;
+      border-radius: 12px;
+      box-shadow: 0 6px 22px rgba(0,0,0,.45);
+    }
+    body.video-mode #active-call-status-label {
+      display: block;
+      position: absolute;
+      left: 54px;
+      top: 103px;
+      z-index: 6;
+      padding: 7px 10px;
+      border-radius: 7px;
+      background: rgba(32,33,36,.72);
+      color: white;
+    }
+
+    #auth-screen { background: radial-gradient(circle at 50% 0%, #3c4043, var(--meet-bg) 60%); }
+    .auth-box { background: var(--meet-surface); border-color: var(--meet-border); box-shadow: 0 18px 60px rgba(0,0,0,.35); }
+    .auth-box h1 { color: var(--meet-text); }
+    .auth-box .auth-sub, .auth-box label, .auth-toggle { color: var(--meet-muted); }
+    .modal { background: rgba(0,0,0,.68); }
+    .modal-box { background: var(--meet-surface); color: var(--meet-text); }
+
+    @media (max-width: 760px) {
+      .app-container { display: flex; min-height: 100vh; }
+      header { padding: 14px 16px; }
+      .status-badge { padding: 5px 8px; }
+      nav.bottom-nav {
+        position: fixed;
+        inset: auto 0 0 0;
+        width: 100%;
+        height: 68px;
+        padding: 0;
+        flex-direction: row;
+        border: 0;
+        border-top: 1px solid var(--meet-border);
+        gap: 0;
+      }
+      .nav-item { width: auto; min-height: 0; padding: 0; flex: 1; flex-direction: column; justify-content: center; gap: 4px; }
+      .content-area { padding: 22px 16px 92px; }
+      .btn-logout { display: none; }
+      .call-overlay { padding: 24px 20px 104px; }
+      .call-overlay::before { top: 20px; left: 20px; }
+      .call-overlay::after { display: none; }
+      .video-container { inset: 66px 12px 98px; border-radius: 12px; }
+      #remote-video { border-radius: 12px; }
+      #local-video { top: 12px; right: 12px; width: 120px; }
+      .call-buttons-row { bottom: 20px; gap: 10px; padding: 9px 11px; }
+    }
   </style>
 </head>
 <body>
+  <!-- Écran d'authentification (affiché si pas de session) -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h1>Yam</h1>
+      <p class="auth-sub">Connectez-vous pour passer des appels.</p>
+      <div id="auth-error" class="auth-error" role="alert"></div>
+
+      <!-- Formulaire de connexion -->
+      <form id="auth-login-form">
+        <div class="field">
+          <label for="auth-phone">Numéro de téléphone</label>
+          <input type="tel" id="auth-phone" autocomplete="tel" placeholder="+33 6 12 34 56 78" required>
+        </div>
+        <div class="field">
+          <label for="auth-password">Mot de passe</label>
+          <input type="password" id="auth-password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary">Se connecter</button>
+      </form>
+
+      <!-- Formulaire d'inscription (caché par défaut) -->
+      <form id="auth-register-form" style="display:none;">
+        <div class="field">
+          <label for="auth-name">Nom complet</label>
+          <input type="text" id="auth-name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="auth-reg-phone">Numéro de téléphone</label>
+          <input type="tel" id="auth-reg-phone" autocomplete="tel" placeholder="+33 6 12 34 56 78" required>
+        </div>
+        <div class="field">
+          <label for="auth-username">Nom d'utilisateur (optionnel)</label>
+          <input type="text" id="auth-username" autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="auth-reg-password">Mot de passe</label>
+          <input type="password" id="auth-reg-password" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <label for="auth-reg-password-confirm">Confirmer le mot de passe</label>
+          <input type="password" id="auth-reg-password-confirm" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn-primary">Créer mon compte</button>
+      </form>
+
+      <div class="auth-toggle">
+        <span id="auth-toggle-text">Pas encore de compte ?</span>
+        <a id="auth-toggle-link">Créer un compte</a>
+      </div>
+    </div>
+  </div>
+
   <div class="app-container">
     <!-- Header -->
     <header>
@@ -462,6 +853,7 @@
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </button>
+        <button id="btn-logout" class="btn-logout" title="Se déconnecter">Déconnexion</button>
       </div>
     </header>
 
@@ -493,8 +885,9 @@
         <div class="section-title">Appel Direct</div>
         <div class="card">
           <div class="form-group">
-            <input type="text" id="target-device-input" class="mono" placeholder="device-a1b2c3d4">
+            <input type="text" id="target-device-input" class="mono" placeholder="Numéro de téléphone ou nom d'utilisateur">
           </div>
+          <div id="direct-search-results" class="search-results"></div>
           <button id="btn-start-call" class="btn-primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
@@ -519,15 +912,12 @@
 
       <!-- Tab 2: Contacts -->
       <section id="tab-contacts" class="tab-pane">
-        <div class="section-title">Nouveau Contact</div>
+        <div class="section-title">Rechercher un utilisateur</div>
         <div class="card">
           <div class="form-group">
-            <input type="text" id="contact-name-input" placeholder="Nom du contact">
+            <input type="text" id="search-users-input" placeholder="Numéro de téléphone, nom ou nom d'utilisateur">
           </div>
-          <div class="form-group">
-            <input type="text" id="contact-id-input" class="mono" placeholder="device-a1b2c3d4">
-          </div>
-          <button id="btn-save-contact" class="btn-primary">Enregistrer le contact</button>
+          <ul id="search-users-results" class="item-list"></ul>
         </div>
 
         <div class="section-title">Mes Contacts</div>
@@ -640,890 +1030,16 @@
 
   <audio id="remote-audio" autoplay playsinline></audio>
   <audio id="ringtone-audio" loop src="sounds/ringtone.mp3"></audio>
+  <audio id="ringback-audio" loop src="sounds/freesound_community-ring-tone-68676 (1).mp3"></audio>
 
   <script src="https://js.pusher.com/8.4/pusher.min.js"></script>
-  <script>
-    // =========================================================
-    // YAM WEB CLIENT — Client WebRTC Complet et Réactif
-    // =========================================================
-
-    function getDefaultServerUrl() {
-      if (window.location.origin && window.location.origin.startsWith("http")) {
-        return window.location.origin;
-      }
-      return "http://" + (window.location.hostname || "192.168.1.80") + ":8000";
-    }
-
-    let savedServerUrl = localStorage.getItem("yam_server_url");
-    // Si l'URL stockée pointe vers une ancienne IP LAN différente du host actuel, on privilégie l'hôte actuel
-    let serverUrl = savedServerUrl || getDefaultServerUrl();
-    if (savedServerUrl && (savedServerUrl.includes("192.168.36.227") || savedServerUrl.includes("trycloudflare")) && window.location.origin.startsWith("http")) {
-      serverUrl = getDefaultServerUrl();
-      localStorage.setItem("yam_server_url", serverUrl);
-    }
-
-    let myDeviceId = localStorage.getItem("yam_device_id");
-    if (!myDeviceId) {
-      myDeviceId = "device-" + Math.random().toString(36).substring(2, 10);
-      localStorage.setItem("yam_device_id", myDeviceId);
-    }
-    let myUserName = localStorage.getItem("yam_user_name") || ("Web " + myDeviceId.slice(-4));
-
-    let pusher = null;
-    let peerConnection = null;
-    let localStream = null;
-    let pendingOffer = null;
-    let pendingCandidates = [];
-    let isAcceptRequested = false;
-    let isAnswered = false;
-    let currentCallPeerId = null;
-    let currentCallPeerName = null;
-    let currentCallId = null;
-    let callTimerInterval = null;
-    let callStartTime = null;
-    let isMicMuted = false;
-    let isCameraOn = false;
-    let currentCallType = "audio"; // "audio" | "video"
-    let iceServersConfig = [
-      { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-      { urls: ["stun:stun.cloudflare.com:3478"] },
-      { urls: "turn:openrelay.metered.ca:80", username: "openrelay", credential: "openrelay" },
-      { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelay", credential: "openrelay" },
-      { urls: "turns:openrelay.metered.ca:443?transport=tcp", username: "openrelay", credential: "openrelay" }
-    ];
-
-    // UI Elements
-    const statusDot = document.getElementById("status-dot");
-    const statusLabel = document.getElementById("status-label");
-    const myDeviceIdEl = document.getElementById("my-device-id");
-    const myDeviceNameEl = document.getElementById("my-device-name");
-    const targetInput = document.getElementById("target-device-input");
-    const btnStartCall = document.getElementById("btn-start-call");
-    const btnCopyId = document.getElementById("btn-copy-id");
-    const btnEditName = document.getElementById("btn-edit-name");
-    const btnSettings = document.getElementById("btn-settings");
-    const contactsListEl = document.getElementById("contacts-list");
-    const historyListEl = document.getElementById("history-list");
-    const incomingOverlay = document.getElementById("incoming-overlay");
-    const activeOverlay = document.getElementById("active-call-overlay");
-    const remoteAudio = document.getElementById("remote-audio");
-    const ringtoneAudio = document.getElementById("ringtone-audio");
-
-    function updateIdentityUI() {
-      myDeviceIdEl.textContent = myDeviceId;
-      myDeviceNameEl.textContent = myUserName;
-    }
-
-    function setStatus(status) {
-      statusDot.className = "status-dot " + status;
-      if (status === "connected") statusLabel.textContent = "Connecté";
-      else if (status === "connecting") statusLabel.textContent = "Connexion…";
-      else statusLabel.textContent = "Déconnecté";
-    }
-
-    function sdpNormalise(sdp) {
-      if (typeof sdp !== "string") return sdp;
-      return sdp.endsWith("\r\n") ? sdp : sdp + "\r\n";
-    }
-
-    // Connect WebSocket & Runtime Config
-    async function initNetwork() {
-      setStatus("connecting");
-      try {
-        const cleanBase = serverUrl.replace(/\/+$/, "");
-        const cfgRes = await fetch(cleanBase + "/api/v1/config").catch(() => null);
-        let wsHost = window.location.hostname || "192.168.1.80";
-        let wsPort = 6001;
-        let wsScheme = "ws";
-        let appKey = "local";
-
-        if (cfgRes && cfgRes.ok) {
-          const cfg = await cfgRes.json();
-          if (cfg.reverb) {
-            appKey = cfg.reverb.app_key || "local";
-            wsHost = cfg.reverb.host || wsHost;
-            wsPort = cfg.reverb.port || wsPort;
-            wsScheme = (cfg.reverb.scheme === "https" || window.location.protocol === "https:") ? "wss" : "ws";
-          }
-          if (cfg.ice_servers && Array.isArray(cfg.ice_servers)) {
-            iceServersConfig = cfg.ice_servers;
-          } else if (cfg.turn && cfg.turn.url) {
-            const urls = cfg.turn.url.split(",").map(u => u.trim());
-            iceServersConfig = [
-              { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"] },
-              { urls: ["stun:stun.cloudflare.com:3478"] },
-              ...urls.map(u => ({
-                urls: u,
-                username: cfg.turn.username || "openrelay",
-                credential: cfg.turn.credential || "openrelay"
-              }))
-            ];
-          }
-        }
-
-        if (pusher) {
-          try { pusher.disconnect(); } catch (_) {}
-        }
-
-        const isTls = (wsScheme === "wss") || (window.location.protocol === "https:");
-        pusher = new Pusher(appKey, {
-          wsHost: wsHost,
-          wsPort: isTls ? 443 : wsPort,
-          wssPort: isTls ? 443 : wsPort,
-          forceTLS: isTls,
-          cluster: "mt1"
-        });
-
-        pusher.connection.bind("connected", () => setStatus("connected"));
-        pusher.connection.bind("connecting", () => setStatus("connecting"));
-        pusher.connection.bind("disconnected", () => setStatus("disconnected"));
-        pusher.connection.bind("failed", () => setStatus("disconnected"));
-
-        const channel = pusher.subscribe("device." + myDeviceId);
-        channel.bind("incoming-call", handleIncomingCall);
-        channel.bind("call-signal", handleCallSignal);
-      } catch (err) {
-        console.error("Init network error:", err);
-        setStatus("disconnected");
-      }
-    }
-
-    // Gestion automatique des changements de réseau (Wi-Fi ↔ 4G)
-    window.addEventListener("online", () => {
-      console.log("[YAM] Réseau reconnecté → relance signalisation...");
-      initNetwork();
-    });
-    window.addEventListener("offline", () => {
-      console.log("[YAM] Réseau hors ligne");
-      setStatus("disconnected");
-    });
-
-    // Reconnexion automatique si perte de WebSocket
-    setInterval(() => {
-      if (pusher && (pusher.connection.state === "disconnected" || pusher.connection.state === "failed")) {
-        if (!peerConnection && !activeOverlay.classList.contains("active")) {
-          console.log("[YAM] Auto-reconnexion WebSocket en cours...");
-          initNetwork();
-        }
-      }
-    }, 7000);
-
-    let titleInterval = null;
-    function startTitleBlink(text) {
-      let isAlt = false;
-      const original = "Yam — Appels Audio WebRTC";
-      if (titleInterval) clearInterval(titleInterval);
-      titleInterval = setInterval(() => {
-        document.title = isAlt ? "📞 (" + text + ")" : "🔔 Appel entrant !";
-        isAlt = !isAlt;
-      }, 800);
-    }
-    function stopTitleBlink() {
-      if (titleInterval) clearInterval(titleInterval);
-      titleInterval = null;
-      document.title = "Yam — Appels Audio WebRTC";
-    }
-
-    // Demande de permission notification
-    document.addEventListener("click", () => {
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission().catch(() => {});
-      }
-    }, { once: true });
-
-    // Call Actions
-    async function startOutgoingCall(targetId, targetName, video) {
-      const clean = (targetId || "").trim();
-      if (!clean) return;
-      currentCallPeerId = clean;
-      currentCallPeerName = targetName || clean;
-      currentCallType = video ? "video" : "audio";
-      isCameraOn = currentCallType === "video";
-      isAnswered = false;
-      isAcceptRequested = false;
-      pendingOffer = null;
-      pendingCandidates = [];
-
-      showActiveCallUI("Appel en cours…");
-
-      // Sonnerie sortante
-      ringtoneAudio.currentTime = 0;
-      ringtoneAudio.play().catch(() => {});
-
-      try {
-        const cleanBase = serverUrl.replace(/\/+$/, "");
-        const ringRes = await fetch(cleanBase + "/api/v1/call/ring", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to_device_id: clean,
-            from_device_id: myDeviceId,
-            from_username: myUserName,
-            type: currentCallType
-          })
-        });
-        // Récupère le call_id pour le stockage différé de l'offre côté serveur.
-        const ringData = await ringRes.json().catch(() => ({}));
-        currentCallId = ringData.call_id || null;
-        console.log("[YAM] 📞 call_id:", currentCallId);
-
-        localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: currentCallType === "video",
-        });
-        peerConnection = createPeerConnection();
-        localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
-        if (currentCallType === "video") showLocalVideo();
-
-        const offer = await peerConnection.createOffer({
-          offerToReceiveAudio: true,
-          offerToReceiveVideo: currentCallType === "video",
-        });
-        await peerConnection.setLocalDescription(offer);
-
-        await sendSignal("offer", {
-          sdp: { type: offer.type, sdp: sdpNormalise(offer.sdp) }
-        });
-      } catch (err) {
-        console.error("Outgoing call error:", err);
-        alert("Impossible d'accéder au micro ou de joindre le serveur : " + err.message);
-        hangUp();
-      }
-    }
-
-    function handleIncomingCall(data) {
-      if (peerConnection || activeOverlay.classList.contains("active")) return;
-      currentCallPeerId = data.from_device_id;
-      currentCallPeerName = data.from_username || data.from_device_id || "Inconnu";
-      currentCallId = data.call_id || null;
-      currentCallType = data.type === "video" ? "video" : "audio";
-      isCameraOn = currentCallType === "video";
-      pendingOffer = null;
-      isAcceptRequested = false;
-      isAnswered = false;
-      pendingCandidates = [];
-
-      document.getElementById("incoming-caller-name").textContent = currentCallPeerName;
-      document.getElementById("incoming-caller-id").textContent = currentCallPeerId;
-      document.getElementById("incoming-avatar").textContent = currentCallPeerName.charAt(0).toUpperCase();
-
-      incomingOverlay.classList.add("active");
-      ringtoneAudio.currentTime = 0;
-      ringtoneAudio.play().catch(() => {});
-      if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]);
-
-      startTitleBlink(currentCallPeerName);
-
-      // Notification bureau si l'onglet est en arrière-plan
-      if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-        try {
-          const n = new Notification("📞 Appel entrant Yam", {
-            body: currentCallPeerName + " vous appelle...",
-            requireInteraction: true,
-            tag: "yam-incoming-call"
-          });
-          n.onclick = () => {
-            window.focus();
-            n.close();
-          };
-        } catch (_) {}
-      }
-    }
-
-    async function acceptIncomingCall() {
-      // Garde-fou anti double-clic : deux acceptIncomingCall() concurrents
-      // feraient un double setRemoteDescription → appel tué.
-      if (isAcceptRequested) return;
-      ringtoneAudio.pause();
-      ringtoneAudio.currentTime = 0;
-      stopTitleBlink();
-      if (navigator.vibrate) navigator.vibrate(0);
-      incomingOverlay.classList.remove("active");
-      isAcceptRequested = true;
-      showActiveCallUI("Connexion…");
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: currentCallType === "video",
-        });
-        peerConnection = createPeerConnection();
-        localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
-        if (currentCallType === "video") showLocalVideo();
-
-        if (pendingOffer) {
-          await answerOffer(pendingOffer);
-        } else {
-          // Offre non reçue en temps réel (appelé hors ligne / reconnexion) :
-          // la récupérer depuis le stockage différé du serveur.
-          await fetchDeferredOffer();
-        }
-      } catch (err) {
-        console.error("Accept error:", err);
-        refuseIncomingCall();
-      }
-    }
-
-    // Récupère l'offre SDP différée (GET /call/{id}/offer) quand elle n'a pas
-    // été reçue en temps réel pendant la sonnerie.
-    async function fetchDeferredOffer() {
-      if (!currentCallId || !myDeviceId) {
-        console.error("[YAM] Offre différée impossible : call_id ou device_id manquant");
-        hangUp();
-        return;
-      }
-      try {
-        const cleanBase = serverUrl.replace(/\/+$/, "");
-        const res = await fetch(
-          `${cleanBase}/api/v1/call/${encodeURIComponent(currentCallId)}/offer?device_id=${encodeURIComponent(myDeviceId)}`,
-          { cache: "no-store" }
-        );
-        if (res.status === 200) {
-          const offerData = await res.json();
-          console.log("[YAM] ✅ Offre différée récupérée (HTTP 200)");
-          const desc = new RTCSessionDescription({
-            type: "offer",
-            sdp: sdpNormalise(offerData.payload.sdp)
-          });
-          await answerOffer(desc);
-        } else {
-          console.error("[YAM] Offre différée indisponible (HTTP " + res.status + ")");
-          hangUp();
-        }
-      } catch (err) {
-        console.error("[YAM] Erreur récupération offre différée:", err);
-        hangUp();
-      }
-    }
-
-    async function answerOffer(offerDesc) {
-      if (!peerConnection || isAnswered) return;
-      await peerConnection.setRemoteDescription(offerDesc);
-      drainPendingCandidates();
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-
-      await sendSignal("answer", {
-        sdp: { type: answer.type, sdp: sdpNormalise(answer.sdp) }
-      });
-      isAnswered = true;
-      onCallEstablished();
-    }
-
-    function refuseIncomingCall() {
-      ringtoneAudio.pause();
-      ringtoneAudio.currentTime = 0;
-      stopTitleBlink();
-      if (navigator.vibrate) navigator.vibrate(0);
-      incomingOverlay.classList.remove("active");
-      if (currentCallPeerId) {
-        sendSignal("bye", {});
-        logCall(currentCallPeerId, currentCallPeerName, true);
-      }
-      teardown();
-    }
-
-    async function handleCallSignal(data) {
-      if (data.from_device_id === myDeviceId) return;
-      const type = data.type;
-      const payload = data.payload || {};
-
-      if (type === "offer") {
-        if (!payload.sdp) return;
-        const desc = new RTCSessionDescription({
-          type: "offer",
-          sdp: sdpNormalise(payload.sdp.sdp)
-        });
-        if (isAcceptRequested && !isAnswered && peerConnection) {
-          await answerOffer(desc);
-        } else {
-          pendingOffer = desc;
-        }
-      } else if (type === "answer") {
-        // Garde-fou anti-double-answer : un second setRemoteDescription
-        // échouerait et tuerait l'appel (envois répétés côté appelant).
-        if (!peerConnection || !payload.sdp || isAnswered) return;
-        try {
-          await peerConnection.setRemoteDescription(new RTCSessionDescription({
-            type: "answer",
-            sdp: sdpNormalise(payload.sdp.sdp)
-          }));
-          isAnswered = true;
-          drainPendingCandidates();
-          onCallEstablished();
-        } catch (e) {
-          console.error("Answer error:", e);
-        }
-      } else if (type === "candidate") {
-        const c = payload.candidate;
-        if (!c || !c.candidate) return;
-        const cand = new RTCIceCandidate(c);
-        if (isAnswered && peerConnection) {
-          peerConnection.addIceCandidate(cand).catch(() => {});
-        } else {
-          pendingCandidates.push(cand);
-        }
-      } else if (type === "bye") {
-        if (currentCallPeerId === data.from_device_id) {
-          const wasInCall = activeOverlay.classList.contains("active");
-          logCall(currentCallPeerId, currentCallPeerName, !wasInCall);
-          hangUp();
-        }
-      }
-    }
-
-    function createPeerConnection() {
-      const pc = new RTCPeerConnection({ iceServers: iceServersConfig });
-      pc.onicecandidate = (e) => {
-        if (e.candidate && currentCallPeerId) {
-          sendSignal("candidate", { candidate: e.candidate.toJSON() });
-        }
-      };
-      pc.ontrack = (e) => {
-        if (e.track.kind === "video") {
-          const remoteVideo = document.getElementById("remote-video");
-          if (remoteVideo) {
-            if (e.streams && e.streams[0]) {
-              remoteVideo.srcObject = e.streams[0];
-            } else {
-              remoteVideo.srcObject = new MediaStream([e.track]);
-            }
-            document.body.classList.add("video-mode");
-          }
-        } else {
-          if (e.streams && e.streams[0]) {
-            remoteAudio.srcObject = e.streams[0];
-          } else {
-            remoteAudio.srcObject = new MediaStream([e.track]);
-          }
-          remoteAudio.play().catch(() => {});
-        }
-      };
-      pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "connected") {
-          onCallEstablished();
-        } else if (pc.connectionState === "failed" || pc.connectionState === "closed") {
-          hangUp();
-        } else if (pc.connectionState === "disconnected") {
-          // Délai de grâce (5 s) : coupures transitoires fréquentes en vidéo.
-          setTimeout(() => {
-            if (peerConnection === pc && pc.connectionState === "disconnected") {
-              hangUp();
-            }
-          }, 5000);
-        }
-      };
-      return pc;
-    }
-
-    function drainPendingCandidates() {
-      if (!peerConnection) return;
-      while (pendingCandidates.length > 0) {
-        const c = pendingCandidates.shift();
-        peerConnection.addIceCandidate(c).catch(() => {});
-      }
-    }
-
-    async function sendSignal(type, payload) {
-      if (!currentCallPeerId) return;
-      const cleanBase = serverUrl.replace(/\/+$/, "");
-      const body = {
-        to_device_id: currentCallPeerId,
-        from_device_id: myDeviceId,
-        type: type,
-        payload: payload
-      };
-      // Associe le call_id (stockage différé de l'offre + invalidation au bye).
-      if (currentCallId) body.call_id = currentCallId;
-      await fetch(cleanBase + "/api/v1/call/signal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      }).catch(err => console.error("Signal error:", err));
-    }
-
-    function showActiveCallUI(statusText) {
-      document.getElementById("active-call-status-label").textContent = statusText;
-      document.getElementById("active-peer-name").textContent = currentCallPeerName;
-      document.getElementById("active-peer-id").textContent = currentCallPeerId;
-      document.getElementById("active-avatar").textContent = currentCallPeerName.charAt(0).toUpperCase();
-      document.getElementById("active-call-timer").textContent = "00:00";
-      activeOverlay.classList.add("active");
-      const camBtn = document.getElementById("btn-toggle-camera");
-      if (camBtn) camBtn.style.display = currentCallType === "video" ? "flex" : "none";
-    }
-
-    function onCallEstablished() {
-      ringtoneAudio.pause();
-      ringtoneAudio.currentTime = 0;
-      stopTitleBlink();
-      document.getElementById("active-call-status-label").textContent = "En Communication";
-      if (!callStartTime) {
-        callStartTime = Date.now();
-        if (callTimerInterval) clearInterval(callTimerInterval);
-        callTimerInterval = setInterval(() => {
-          const s = Math.floor((Date.now() - callStartTime) / 1000);
-          const mm = String(Math.floor(s / 60)).padStart(2, "0");
-          const ss = String(s % 60).padStart(2, "0");
-          document.getElementById("active-call-timer").textContent = `${mm}:${ss}`;
-        }, 1000);
-      }
-    }
-
-    function hangUp() {
-      if (currentCallPeerId) {
-        sendSignal("bye", {});
-        if (callStartTime) {
-          logCall(currentCallPeerId, currentCallPeerName, false);
-        }
-      }
-      teardown();
-    }
-
-    function teardown() {
-      stopTitleBlink();
-      if (callTimerInterval) clearInterval(callTimerInterval);
-      callTimerInterval = null;
-      callStartTime = null;
-      ringtoneAudio.pause();
-      ringtoneAudio.currentTime = 0;
-      if (navigator.vibrate) navigator.vibrate(0);
-      if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-      }
-      if (localStream) {
-        localStream.getTracks().forEach(t => t.stop());
-        localStream = null;
-      }
-      pendingOffer = null;
-      pendingCandidates = [];
-      isAcceptRequested = false;
-      isAnswered = false;
-      isMicMuted = false;
-      isCameraOn = false;
-      currentCallType = "audio";
-      currentCallPeerId = null;
-      currentCallPeerName = null;
-      currentCallId = null;
-      incomingOverlay.classList.remove("active");
-      activeOverlay.classList.remove("active");
-      const btnMute = document.getElementById("btn-toggle-mute");
-      btnMute.classList.remove("muted");
-      // Nettoyer les vidéos
-      const localVideo = document.getElementById("local-video");
-      if (localVideo) { localVideo.srcObject = null; localVideo.style.display = "none"; }
-      const remoteVideo = document.getElementById("remote-video");
-      if (remoteVideo) { remoteVideo.srcObject = null; remoteVideo.style.display = "none"; }
-      document.body.classList.remove("video-mode");
-    }
-
-    function showLocalVideo() {
-      const localVideo = document.getElementById("local-video");
-      if (localVideo && localStream) {
-        localVideo.srcObject = localStream;
-        localVideo.style.display = "block";
-      }
-    }
-
-    function toggleCamera() {
-      if (!localStream) return;
-      isCameraOn = !isCameraOn;
-      localStream.getVideoTracks().forEach(t => t.enabled = isCameraOn);
-      const btn = document.getElementById("btn-toggle-camera");
-      if (btn) {
-        btn.classList.toggle("muted", !isCameraOn);
-        btn.setAttribute("aria-label", isCameraOn ? "Couper la caméra" : "Activer la caméra");
-        btn.setAttribute("title", isCameraOn ? "Couper la caméra" : "Activer la caméra");
-      }
-    }
-
-    function toggleMute() {
-      if (!localStream) return;
-      isMicMuted = !isMicMuted;
-      localStream.getAudioTracks().forEach(t => t.enabled = !isMicMuted);
-      const btn = document.getElementById("btn-toggle-mute");
-      btn.classList.toggle("muted", isMicMuted);
-    }
-
-    // Contacts & History Storage
-    function getContacts() {
-      return JSON.parse(localStorage.getItem("yam_contacts") || "[]");
-    }
-    function saveContacts(list) {
-      localStorage.setItem("yam_contacts", JSON.stringify(list));
-      renderContacts();
-    }
-    // Échappe une chaîne pour une injection sûre dans innerHTML (texte/attributs).
-    // NB : ne PAS utiliser pour construire du code JS (onclick) — voir les
-    // handlers addEventListener ci-dessous qui éliminent ce vecteur.
-    function esc(s) {
-      const d = document.createElement("div");
-      d.textContent = s == null ? "" : String(s);
-      return d.innerHTML;
-    }
-
-    function renderContacts() {
-      const contacts = getContacts();
-      contactsListEl.innerHTML = "";
-      if (contacts.length === 0) {
-        contactsListEl.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding:24px 0;">Aucun contact enregistré</li>';
-        return;
-      }
-      contacts.forEach((c, idx) => {
-        const li = document.createElement("li");
-        li.className = "item-card";
-        li.innerHTML = `
-          <div class="item-info">
-            <span class="item-name">${esc(c.name)}</span>
-            <span class="item-sub">${esc(c.deviceId)}</span>
-          </div>
-          <div class="item-actions">
-            <button class="btn-icon" style="color:var(--accent);" title="Appeler" data-action="call">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            </button>
-            <button class="btn-icon" style="color:var(--accent);" title="Appel vidéo" data-action="video">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            </button>
-            <button class="btn-icon" title="Supprimer" data-action="delete">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-          </div>
-        `;
-        // Handlers via addEventListener + dataset : aucune concaténation de code
-        // JS → élimine le vecteur XSS par injection dans les attributs onclick.
-        li.querySelector('[data-action="call"]').addEventListener("click", () => {
-          startOutgoingCall(c.deviceId, c.name);
-        });
-        li.querySelector('[data-action="video"]').addEventListener("click", () => {
-          startOutgoingCall(c.deviceId, c.name, true);
-        });
-        li.querySelector('[data-action="delete"]').addEventListener("click", () => {
-          deleteContact(idx);
-        });
-        contactsListEl.appendChild(li);
-      });
-    }
-    window.deleteContact = (idx) => {
-      const list = getContacts();
-      list.splice(idx, 1);
-      saveContacts(list);
-    };
-
-    function logCall(peerId, peerName, missed) {
-      const history = JSON.parse(localStorage.getItem("yam_calls") || "[]");
-      history.unshift({
-        id: Date.now().toString(),
-        peerId,
-        peerName: peerName || peerId,
-        at: new Date().toISOString(),
-        missed: !!missed
-      });
-      if (history.length > 50) history.pop();
-      localStorage.setItem("yam_calls", JSON.stringify(history));
-      renderHistory();
-    }
-    function renderHistory() {
-      const history = JSON.parse(localStorage.getItem("yam_calls") || "[]");
-      historyListEl.innerHTML = "";
-      if (history.length === 0) {
-        historyListEl.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding:24px 0;">Aucun appel dans l\'historique</li>';
-        return;
-      }
-      history.forEach((h, idx) => {
-        const d = new Date(h.at);
-        const dateStr = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth()+1).padStart(2, "0") + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
-        const li = document.createElement("li");
-        li.className = "item-card";
-        li.innerHTML = `
-          <div class="item-info">
-            <div style="display:flex; align-items:center;">
-              <span class="item-name" style="${h.missed ? 'color:var(--danger);' : ''}">${esc(h.peerName)}</span>
-              ${h.missed ? '<span class="tag-missed">Manqué</span>' : ''}
-            </div>
-            <span class="item-sub">${esc(h.peerId)} · ${dateStr}</span>
-          </div>
-          <div class="item-actions">
-            <button class="btn-icon" style="color:var(--accent);" title="Rappeler" data-action="call">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            </button>
-            <button class="btn-icon" style="color:var(--accent);" title="Rappeler en vidéo" data-action="video">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            </button>
-            <button class="btn-icon" title="Effacer" data-action="delete">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-          </div>
-        `;
-        // addEventListener + dataset : élimine le vecteur XSS des onclick.
-        li.querySelector('[data-action="call"]').addEventListener("click", () => {
-          startOutgoingCall(h.peerId, h.peerName);
-        });
-        li.querySelector('[data-action="video"]').addEventListener("click", () => {
-          startOutgoingCall(h.peerId, h.peerName, true);
-        });
-        li.querySelector('[data-action="delete"]').addEventListener("click", () => {
-          deleteHistory(idx);
-        });
-        historyListEl.appendChild(li);
-      });
-    }
-    window.deleteHistory = (idx) => {
-      const history = JSON.parse(localStorage.getItem("yam_calls") || "[]");
-      history.splice(idx, 1);
-      localStorage.setItem("yam_calls", JSON.stringify(history));
-      renderHistory();
-    };
-
-    // Event Listeners
-    btnCopyId.addEventListener("click", () => {
-      navigator.clipboard.writeText(myDeviceId);
-      alert("Identifiant copié dans le presse-papiers !");
-    });
-
-    btnEditName.addEventListener("click", () => {
-      const newName = prompt("Modifier mon nom d'appareil :", myUserName);
-      if (newName && newName.trim()) {
-        myUserName = newName.trim();
-        localStorage.setItem("yam_user_name", myUserName);
-        updateIdentityUI();
-      }
-    });
-
-    btnStartCall.addEventListener("click", () => {
-      startOutgoingCall(targetInput.value);
-    });
-
-    document.getElementById("btn-accept-call").addEventListener("click", acceptIncomingCall);
-    document.getElementById("btn-refuse-call").addEventListener("click", refuseIncomingCall);
-    document.getElementById("btn-hangup").addEventListener("click", hangUp);
-    document.getElementById("btn-toggle-mute").addEventListener("click", toggleMute);
-    document.getElementById("btn-toggle-camera").addEventListener("click", toggleCamera);
-
-    document.getElementById("btn-save-contact").addEventListener("click", () => {
-      const name = document.getElementById("contact-name-input").value.trim();
-      const devId = document.getElementById("contact-id-input").value.trim();
-      if (!name || !devId) return;
-      const list = getContacts();
-      list.push({ name, deviceId: devId });
-      saveContacts(list);
-      document.getElementById("contact-name-input").value = "";
-      document.getElementById("contact-id-input").value = "";
-    });
-
-    // Tab Navigation
-    document.querySelectorAll(".nav-item").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById(btn.dataset.tab).classList.add("active");
-      });
-    });
-
-    // Settings Modal
-    const modalSettings = document.getElementById("modal-settings");
-    btnSettings.addEventListener("click", () => {
-      document.getElementById("settings-server-url").value = serverUrl;
-      document.getElementById("settings-user-name").value = myUserName;
-      modalSettings.classList.add("active");
-    });
-    document.getElementById("btn-cancel-settings").addEventListener("click", () => {
-      modalSettings.classList.remove("active");
-    });
-    document.getElementById("btn-save-settings").addEventListener("click", () => {
-      const u = document.getElementById("settings-server-url").value.trim();
-      const n = document.getElementById("settings-user-name").value.trim();
-      if (u) {
-        serverUrl = u;
-        localStorage.setItem("yam_server_url", serverUrl);
-      }
-      if (n) {
-        myUserName = n;
-        localStorage.setItem("yam_user_name", myUserName);
-        updateIdentityUI();
-      }
-      modalSettings.classList.remove("active");
-      initNetwork();
-    });
-
-    // ─────────── Web Push (FCM) — réveiller l'onglet fermé ───────────
-    const VAPID_PUBLIC_KEY = "BJtX1Wj7pUoLl6ALPz_Izz1_0mrRGsg5StuNAY_sFpb8aoGZgesJv0o6AZ8pRCoQPjSr2a_yCiG1JyFN0XRh-fA";
-
-    function loadFirebaseCompat() {
-      return new Promise((resolve, reject) => {
-        if (window.firebase && window.firebase.messaging) { resolve(); return; }
-        const scripts = [
-          "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js",
-          "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js",
-        ];
-        let loaded = 0;
-        scripts.forEach((src) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.onload = () => { loaded++; if (loaded === scripts.length) resolve(); };
-          s.onerror = () => reject(new Error("Échec chargement SDK Firebase: " + src));
-          document.head.appendChild(s);
-        });
-      });
-    }
-
-    async function registerWebPush() {
-      try {
-        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-          console.warn("[push] Service Worker / Web Push non supporté");
-          return;
-        }
-        const reg = await navigator.serviceWorker.register("/sw.js");
-        console.log("[push] Service Worker enregistré");
-
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") {
-          console.warn("[push] Permission notification refusée");
-          return;
-        }
-
-        await loadFirebaseCompat();
-        const app = firebase.initializeApp({
-          apiKey: "AIzaSyDdvlw8j9HTSbxRdir0L67v5XKdsellimY",
-          authDomain: "projetyam-eddc1.firebaseapp.com",
-          projectId: "projetyam-eddc1",
-          storageBucket: "projetyam-eddc1.firebasestorage.app",
-          messagingSenderId: "110051295714",
-          appId: "1:110051295714:web:1cf81058bf2aa3016e79bb",
-          measurementId: "G-SYF2XDG54K",
-        });
-        const messaging = firebase.messaging(app);
-        const token = await messaging.getToken({
-          vapidKey: VAPID_PUBLIC_KEY,
-          serviceWorkerRegistration: reg,
-        });
-        console.log("[push] Token FCM obtenu");
-
-        // Enregistre le device avec le token FCM dans le backend.
-        const cleanBase = serverUrl.replace(/\/+$/, "");
-        await fetch(cleanBase + "/api/v1/devices/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            label: myUserName,
-            device_id: myDeviceId,
-            platform: "web",
-            fcm_token: token,
-          }),
-        });
-        console.log("[push] Token FCM enregistré côté serveur");
-      } catch (err) {
-        console.warn("[push] Erreur Web Push", err);
-      }
-    }
-
-    // Startup
-    updateIdentityUI();
-    renderContacts();
-    renderHistory();
-    initNetwork();
-    registerWebPush();
-  </script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/spa-core.js"></script>
+  <script src="js/spa-auth.js"></script>
+  <script src="js/spa-network.js"></script>
+  <script src="js/spa-calls.js"></script>
+  <script src="js/spa-contacts.js"></script>
+  <script src="js/spa-push.js"></script>
+  <script src="js/spa-bootstrap.js"></script>
 </body>
 </html>

@@ -417,6 +417,8 @@
     let isAnswered = false;
     let pendingOffer = null;
     let cameraOn = false;
+    let autoDecline = null;   // timeout de déclin auto (45 s)
+    let timerInterval = null; // intervalle du minuteur d'appel
     const pendingRemoteCandidates = [];
 
     // ---------------------------------------------------------
@@ -441,15 +443,22 @@
 
     function sendSignal(type, payload, fromDeviceId, toDeviceId) {
       console.log(`[incoming] 📤 Envoi signal "${type}" → device ${toDeviceId}`);
+      const body = {
+        to_device_id: toDeviceId,
+        from_device_id: fromDeviceId,
+        type: type,
+        payload: payload,
+      };
+      // Associe le call_id (stockage différé de l'offre + invalidation au bye).
+      const callId = sessionStorage.getItem("incoming_call_id");
+      if (callId) body.call_id = callId;
+      const headers = { "Content-Type": "application/json" };
+      const token = localStorage.getItem("auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
       fetch(API_SIGNAL_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to_device_id: toDeviceId,
-          from_device_id: fromDeviceId,
-          type: type,
-          payload: payload,
-        }),
+        headers: headers,
+        body: JSON.stringify(body),
       })
         .then((res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -467,7 +476,15 @@
         return;
       }
       try {
-        const sdpStr = typeof offerPayload === "string" ? offerPayload : (offerPayload?.sdp || "");
+        // Le payload peut être :
+        //  - une string SDP brute (temps réel) ;
+        //  - {sdp: "v=0..."} (temps réel, wrapper) ;
+        //  - {sdp: {type: "offer", sdp: "v=0..."}} (offre différée serveur).
+        const sdpStr = typeof offerPayload === "string"
+          ? offerPayload
+          : (typeof offerPayload?.sdp === "string"
+              ? offerPayload.sdp
+              : (offerPayload?.sdp?.sdp || ""));
         const offerDesc = new RTCSessionDescription({
           type: "offer",
           sdp: sdpNormalise(sdpStr),
@@ -676,6 +693,14 @@
 
     function endCall(message) {
       cleanup();
+      // Nettoie aussi les timers de sonnerie/auto-decline et les données
+      // d'appel résiduelles (sinon un refresh ré-affiche un appel fantôme).
+      clearTimeout(autoDecline);
+      clearInterval(timerInterval);
+      sessionStorage.removeItem("incoming_call_id");
+      sessionStorage.removeItem("incoming_call_from");
+      sessionStorage.removeItem("incoming_call_from_device_id");
+      sessionStorage.removeItem("incoming_call_type");
       document.getElementById("call-content").style.display = "none";
       document.getElementById("call-status").textContent = message || "Appel terminé.";
       setTimeout(() => { window.location.href = "contacts.html"; }, 1500);
@@ -789,12 +814,12 @@
       startVibrating();
 
       // ÉCOUTER LE SIGNALING DÈS LA SONNERIE (pour ne pas rater l'offre SDP !)
-      const pusher = new Pusher(REVERB_APP_KEY, {
-        wsHost: hostConfig.wsHost,
-        wsPort: hostConfig.wsPort,
-        wssPort: hostConfig.wsPort,
-        forceTLS: hostConfig.forceTLS,
-        cluster: "",
+      // Connexion à Pusher.com (SaaS) : le SDK choisit automatiquement le bon
+      // endpoint wss://ws-{cluster}.pusher.com à partir de la clé et du cluster
+      // (PUSHER_APP_KEY / PUSHER_CLUSTER chargés par incoming-call-listener.js).
+      const pusher = new Pusher(PUSHER_APP_KEY, {
+        cluster: PUSHER_CLUSTER,
+        forceTLS: true,
       });
 
       const channel = pusher.subscribe("device." + myDeviceId);
@@ -837,14 +862,14 @@
       });
 
       let seconds = 0;
-      const timerInterval = setInterval(() => {
+      timerInterval = setInterval(() => {
         seconds++;
         const m = Math.floor(seconds / 60);
         const s = String(seconds % 60).padStart(2, "0");
         timerEl.textContent = `${m}:${s}`;
       }, 1000);
 
-      const autoDecline = setTimeout(() => declineCall(), 45000);
+      autoDecline = setTimeout(() => declineCall(), 45000);
 
       document.getElementById("btn-accept").addEventListener("click", () => {
         // Bloque le double-clic : deux acceptCall() concurrents feraient un

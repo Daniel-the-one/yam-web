@@ -6,7 +6,8 @@ let localStream = null;
 let peerConnection = null;
 let callTimer = null;
 let callSeconds = 0;
-let targetDeviceId = null;
+let targetUserId = null;   // id de l'utilisateur cible (résout tous ses devices)
+let targetDeviceId = null; // device_id du correspondant, appris au premier signal answer
 let myDeviceId = null;
 let currentCallId = null;
 const pendingRemoteCandidates = [];
@@ -100,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await window.__runtimeConfigReady;
   }
   console.log("[call] 🌐 Config réseau:", JSON.stringify(hostConfig));
-  targetDeviceId = sessionStorage.getItem("call_target_device_id");
+  targetUserId = sessionStorage.getItem("call_target_user_id");
   const targetUsername = sessionStorage.getItem("call_target_username") || "Inconnu";
   callType = sessionStorage.getItem("call_type") === "video" ? "video" : "audio";
   cameraOn = callType === "video";
@@ -110,10 +111,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     myDeviceId = "device-" + Math.random().toString(36).substring(2, 10);
     localStorage.setItem("device_id", myDeviceId);
   }
-  console.log("[call] 🆔 Mon device_id:", myDeviceId, "| Cible:", targetDeviceId, "| Type:", callType);
+  console.log("[call] 🆔 Mon device_id:", myDeviceId, "| Cible user_id:", targetUserId, "| Type:", callType);
 
-  if (!targetDeviceId) {
-    showStatus("Aucun appareil cible.");
+  if (!targetUserId) {
+    showStatus("Aucun utilisateur cible.");
     return;
   }
 
@@ -238,20 +239,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const sdpString = sdpNormalise(offer.sdp);
 
-    // Faire sonner le destinataire
+    // Faire sonner le destinataire (tous ses appareils)
+    const ringHeaders = { "Content-Type": "application/json" };
+    const ringToken = localStorage.getItem("auth_token");
+    if (ringToken) ringHeaders["Authorization"] = `Bearer ${ringToken}`;
     const ringRes = await fetch(API_RING_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: ringHeaders,
       body: JSON.stringify({
-        to_device_id: targetDeviceId,
+        to_user_id: targetUserId,
         from_device_id: myDeviceId,
-        from_username: localStorage.getItem("user_id") || "Appelant",
+        from_username: localStorage.getItem("user_name") || "Appelant",
         type: callType,
       }),
     });
     // Récupère le call_id pour le stockage différé de l'offre côté serveur.
     const ringData = await ringRes.json().catch(() => ({}));
-    currentCallId = ringData.call_id || null;
+    if (!ringRes.ok) {
+      throw new Error(ringData.error?.message || "Échec de la sonnerie (HTTP " + ringRes.status + ")");
+    }
+    currentCallId = ringData.data?.call_id || ringData.call_id || null;
     console.log("[call] 📞 call_id:", currentCallId);
 
     // Démarrer la sonnerie d'attente (ringback)
@@ -303,18 +310,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ---- Signaling ----
 
 function sendSignal(type, payload) {
-  console.log(`[call] 📤 Envoi signal "${type}" → device ${targetDeviceId}`);
+  console.log(`[call] 📤 Envoi signal "${type}" → user ${targetUserId} / device ${targetDeviceId}`);
   const body = {
-    to_device_id: targetDeviceId,
     from_device_id: myDeviceId,
     type: type,
     payload: payload,
   };
+  // L'offre est routée vers l'utilisateur cible (tous ses appareils).
+  // Les autres signaux (answer/candidate/bye) ciblent le device précis
+  // appris au premier signal answer reçu.
+  if (type === "offer") {
+    body.to_user_id = targetUserId;
+  } else if (type === "bye") {
+    if (targetDeviceId) body.to_device_id = targetDeviceId;
+    if (targetUserId) body.to_user_id = targetUserId;
+  } else if (targetDeviceId) {
+    body.to_device_id = targetDeviceId;
+  }
   // Associe le call_id (stockage différé de l'offre + invalidation au bye).
   if (currentCallId) body.call_id = currentCallId;
+  const headers = { "Content-Type": "application/json" };
+  const token = localStorage.getItem("auth_token");
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   fetch(API_SIGNAL_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: headers,
     body: JSON.stringify(body),
   })
     .then((res) => {
@@ -325,12 +345,9 @@ function sendSignal(type, payload) {
 }
 
 function setupSignalListener() {
-  const pusher = new Pusher(REVERB_APP_KEY, {
-    wsHost: hostConfig.wsHost,
-    wsPort: hostConfig.wsPort,
-    wssPort: hostConfig.wsPort,
-    forceTLS: hostConfig.forceTLS,
-    cluster: "",
+  const pusher = new Pusher(PUSHER_APP_KEY, {
+    cluster: PUSHER_CLUSTER,
+    forceTLS: true,
   });
 
   const channel = pusher.subscribe("device." + myDeviceId);
@@ -344,6 +361,12 @@ function setupSignalListener() {
 
     if (data.type === "answer" && peerConnection && !isAnswered) {
       try {
+        // Apprend le device_id du correspondant depuis le signal answer.
+        // C'est lui qui recevra les candidates et le bye.
+        if (data.from_device_id) {
+          targetDeviceId = data.from_device_id;
+          console.log("[call] 🎯 Device du correspondant appris:", targetDeviceId);
+        }
         const sdpPayload = data.payload?.sdp;
         const sdpStr = typeof sdpPayload === "string" ? sdpPayload : (sdpPayload?.sdp || "");
         if (!sdpStr) {
@@ -425,7 +448,7 @@ function endCall(message) {
   if (ended) return;
   ended = true;
   stopRingback();
-  if (!byeSignalSent && targetDeviceId) {
+  if (!byeSignalSent && (targetDeviceId || targetUserId)) {
     sendSignal("bye", {});
     byeSignalSent = true;
   }
