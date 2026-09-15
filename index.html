@@ -342,6 +342,17 @@
       margin: 16px 0 24px;
       color: #fff;
     }
+    .call-solde {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.1);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-top: -14px;
+      margin-bottom: 10px;
+    }
 
     .call-buttons-row {
       display: flex;
@@ -882,6 +893,12 @@
           </div>
         </div>
 
+        <div class="section-title">Mon Solde</div>
+        <div class="card" id="solde-card" style="display:none; justify-content:space-between; align-items:center;">
+          <span style="font-weight:600;">Solde disponible</span>
+          <span id="solde-amount" style="font-family:var(--font-mono); font-weight:700; font-size:1.1rem;">—</span>
+        </div>
+
         <div class="section-title">Appel Direct</div>
         <div class="card">
           <div class="form-group">
@@ -981,6 +998,7 @@
       </div>
       <div id="active-call-status-label" class="call-title">En Communication</div>
       <div id="active-call-timer" class="call-timer">00:00</div>
+      <div id="active-call-solde" class="call-solde" style="display:none;">Solde : —</div>
       <div id="active-avatar" class="avatar-circle">?</div>
       <div id="active-peer-name" class="call-peer-name">Correspondant</div>
       <div id="active-peer-id" class="call-peer-id">device-xxxx</div>

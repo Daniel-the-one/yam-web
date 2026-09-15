@@ -7,5 +7,6 @@
         renderHistory();
         initNetwork();
         registerWebPush();
+        refreshSolde(); // affiche la carte "Mon solde" si l'utilisateur est patient
       }
     })();

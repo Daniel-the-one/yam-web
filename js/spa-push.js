@@ -55,9 +55,12 @@
 
         // Enregistre le device avec le token FCM dans le backend.
         const cleanBase = serverUrl.replace(/\/+$/, "");
-        await fetch(cleanBase + "/api/v1/devices/register", {
+        const response = await fetch(cleanBase + "/api/v1/devices/register", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("auth_token") || ""}`,
+          },
           body: JSON.stringify({
             label: myUserName,
             device_id: myDeviceId,
@@ -65,6 +68,9 @@
             fcm_token: token,
           }),
         });
+        if (!response.ok) {
+          throw new Error("Enregistrement FCM refusé (HTTP " + response.status + ")");
+        }
         console.log("[push] Token FCM enregistré côté serveur");
       } catch (err) {
         console.warn("[push] Erreur Web Push", err);

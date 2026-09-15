@@ -35,7 +35,9 @@
 
     function storeSession(data) {
       const d = data?.data || {};
-      localStorage.setItem("auth_token", d.token || "");
+      // Ne JAMAIS écraser un token existant par une chaîne vide : les réponses
+      // comme /users/me ne contiennent pas de token et on perdrait la session.
+      if (d.token) localStorage.setItem("auth_token", d.token);
       const user = d.user || {};
       localStorage.setItem("user_id", user.id != null ? String(user.id) : "");
       localStorage.setItem("user_name", user.name || "");
@@ -43,6 +45,8 @@
       localStorage.setItem("user_phone", user.phone_number || "");
       if (d.device?.label) localStorage.setItem("device_label", d.device.label);
       if (user.name) myUserName = user.name;
+      // Rôle (patient/médecin) pour afficher le solde et piloter l'init d'appel.
+      localStorage.setItem("user_role", user.role || "");
       updateIdentityUI();
     }
 
@@ -169,6 +173,7 @@
       localStorage.removeItem("user_name");
       localStorage.removeItem("user_username");
       localStorage.removeItem("user_phone");
+      localStorage.removeItem("user_role");
       if (typeof renderContacts === "function") renderContacts();
       if (typeof renderHistory === "function") renderHistory();
       showAuthScreen();
@@ -226,6 +231,7 @@
           localStorage.removeItem("user_name");
           localStorage.removeItem("user_username");
           localStorage.removeItem("user_phone");
+          localStorage.removeItem("user_role");
           showAuthError("Session invalide ou expirée. Veuillez vous reconnecter.");
           showAuthScreen();
           return false;

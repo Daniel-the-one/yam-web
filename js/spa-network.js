@@ -36,9 +36,16 @@
 
         // Connexion à Pusher.com (SaaS) : le SDK choisit automatiquement le
         // bon endpoint wss://ws-{cluster}.pusher.com à partir de la clé et du cluster.
+        // authEndpoint + auth.headers : permet de s'abonner aux canaux PRIVÉS
+        // (private-user.{id}) — le serveur valide le token Sanctum via
+        // POST /broadcasting/auth (BroadcastServiceProvider, auth:sanctum).
         pusher = new Pusher(appKey, {
           cluster: cluster,
-          forceTLS: true
+          forceTLS: true,
+          authEndpoint: cleanBase + "/broadcasting/auth",
+          auth: {
+            headers: { Authorization: "Bearer " + (authToken() || "") }
+          }
         });
 
         pusher.connection.bind("connected", () => setStatus("connected"));
@@ -49,6 +56,15 @@
         const channel = pusher.subscribe("device." + myDeviceId);
         channel.bind("incoming-call", handleIncomingCall);
         channel.bind("call-signal", handleCallSignal);
+
+        // Canal PRIVÉ de l'utilisateur connecté : reçoit AppelLance (appel
+        // facturé qui sonne) avec l'appel_id nécessaire au décrochage et au
+        // heartbeat. L'événement est nommé "appel.lance" (broadcastAs).
+        const myUserId = localStorage.getItem("user_id");
+        if (myUserId) {
+          const privateChannel = pusher.subscribe("private-user." + myUserId);
+          privateChannel.bind("appel.lance", handleAppelLance);
+        }
       } catch (err) {
         console.error("Init network error:", err);
         setStatus("disconnected");

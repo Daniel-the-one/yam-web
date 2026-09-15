@@ -62,9 +62,12 @@ async function registerWebPush(apiBase, deviceId) {
     console.log("[push] Token FCM obtenu");
 
     // Enregistre le token FCM dans le backend.
-    await fetch(`${apiBase}/devices/register`, {
+    const response = await fetch(`${apiBase}/devices/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("auth_token") || ""}`,
+      },
       body: JSON.stringify({
         label: localStorage.getItem("device_label") || `Web ${deviceId.slice(-4)}`,
         device_id: deviceId,
@@ -72,6 +75,9 @@ async function registerWebPush(apiBase, deviceId) {
         fcm_token: token,
       }),
     });
+    if (!response.ok) {
+      throw new Error("Enregistrement FCM refusé (HTTP " + response.status + ")");
+    }
     console.log("[push] Token FCM enregistré côté serveur");
   } catch (err) {
     console.warn("[push] Erreur enregistrement Web Push", err);
