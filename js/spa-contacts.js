@@ -1,16 +1,12 @@
-    // Contacts & History Storage (scopés par compte utilisateur)
+    // Contacts stockés dans l'API ; historique local au navigateur.
     function currentUserId() {
       return localStorage.getItem("user_id") || "default";
     }
 
+    let savedContacts = [];
+
     function getContacts() {
-      const uid = currentUserId();
-      return JSON.parse(localStorage.getItem("yam_contacts_" + uid) || "[]");
-    }
-    function saveContacts(list) {
-      const uid = currentUserId();
-      localStorage.setItem("yam_contacts_" + uid, JSON.stringify(list));
-      renderContacts();
+      return savedContacts;
     }
     // Échappe une chaîne pour une injection sûre dans innerHTML (texte/attributs).
     // NB : ne PAS utiliser pour construire du code JS (onclick) — voir les
@@ -28,7 +24,7 @@
         contactsListEl.innerHTML = '<li style="text-align:center; color:var(--text-muted); padding:24px 0;">Aucun contact enregistré</li>';
         return;
       }
-      contacts.forEach((c, idx) => {
+      contacts.forEach((c) => {
         const li = document.createElement("li");
         li.className = "item-card";
         li.innerHTML = `
@@ -57,16 +53,81 @@
           startOutgoingCall(c.userId, c.name, true);
         });
         li.querySelector('[data-action="delete"]').addEventListener("click", () => {
-          deleteContact(idx);
+          deleteContact(c.userId);
         });
         contactsListEl.appendChild(li);
       });
     }
-    window.deleteContact = (idx) => {
-      const list = getContacts();
-      list.splice(idx, 1);
-      saveContacts(list);
-    };
+
+    async function loadSavedContacts() {
+      const cleanBase = serverUrl.replace(/\/+$/, "");
+      const fetchFn = window.fetchAuth || fetch;
+      try {
+        const res = await fetchFn(cleanBase + apiPrefix() + "/contacts");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        savedContacts = (data.contacts || []).map((contact) => ({
+          userId: String(contact.user_id),
+          name: contact.name || contact.phone_number,
+          phone: contact.phone_number,
+        }));
+
+        const migrationKey = "yam_contacts_migrated_" + currentUserId();
+        if (localStorage.getItem(migrationKey) !== "1") {
+          let legacy = [];
+          try {
+            legacy = JSON.parse(localStorage.getItem("yam_contacts_" + currentUserId()) || "[]");
+          } catch (error) {
+            console.warn("[contacts] Anciens contacts locaux illisibles", error);
+          }
+          let migrated = false;
+          for (const contact of legacy) {
+            if (!/^\d+$/.test(String(contact.userId)) ||
+                savedContacts.some((saved) => saved.userId === String(contact.userId))) {
+              continue;
+            }
+            const create = await fetchFn(cleanBase + apiPrefix() + "/contacts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contact_user_id: Number(contact.userId) }),
+            });
+            if (!create.ok) throw new Error("Échec de migration d'un ancien contact (HTTP " + create.status + ").");
+            migrated = true;
+          }
+          localStorage.setItem(migrationKey, "1");
+          if (migrated) {
+            const updated = await fetchFn(cleanBase + apiPrefix() + "/contacts");
+            if (!updated.ok) throw new Error("Impossible d'actualiser les contacts migrés.");
+            const updatedData = await updated.json();
+            savedContacts = (updatedData.contacts || []).map((contact) => ({
+              userId: String(contact.user_id),
+              name: contact.name || contact.phone_number,
+              phone: contact.phone_number,
+            }));
+          }
+        }
+        renderContacts();
+      } catch (error) {
+        console.error("[contacts] Impossible de charger les contacts", error);
+        contactsListEl.innerHTML = '<li class="search-empty">Impossible de charger les contacts enregistrés.</li>';
+      }
+    }
+
+    async function deleteContact(userId) {
+      const cleanBase = serverUrl.replace(/\/+$/, "");
+      const fetchFn = window.fetchAuth || fetch;
+      try {
+        const res = await fetchFn(cleanBase + apiPrefix() + "/contacts/" + encodeURIComponent(userId), {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        await loadSavedContacts();
+      } catch (error) {
+        console.error("[contacts] Impossible de supprimer le contact", error);
+        alert("Impossible de supprimer ce contact. Réessayez.");
+      }
+    }
+    window.deleteContact = deleteContact;
 
     function getHistory() {
       const uid = currentUserId();
@@ -197,7 +258,7 @@
       try {
         const cleanBase = serverUrl.replace(/\/+$/, "");
         const fetchFn = window.fetchAuth || fetch;
-        const res = await fetchFn(cleanBase + "/api/v1/users/search?q=" + encodeURIComponent(q) + "&limit=8");
+        const res = await fetchFn(cleanBase + apiPrefix() + "/users/search?q=" + encodeURIComponent(q) + "&limit=8");
         if (!res.ok) return [];
         const data = await res.json();
         return data.data || [];
@@ -239,11 +300,23 @@
         li.querySelector('[data-action="video"]').addEventListener("click", () => {
           startOutgoingCall(String(u.id), u.name || u.phone_number, true);
         });
-        li.querySelector('[data-action="add"]').addEventListener("click", () => {
-          const list = getContacts();
-          if (!list.some(c => String(c.userId) === String(u.id))) {
-            list.push({ userId: String(u.id), name: u.name || u.phone_number, phone: u.phone_number });
-            saveContacts(list);
+        li.querySelector('[data-action="add"]').addEventListener("click", async () => {
+          const cleanBase = serverUrl.replace(/\/+$/, "");
+          const fetchFn = window.fetchAuth || fetch;
+          try {
+            const res = await fetchFn(cleanBase + apiPrefix() + "/contacts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contact_user_id: Number(u.id) }),
+            });
+            if (!res.ok) {
+              const data = await res.json().catch(() => null);
+              throw new Error(data?.message || "HTTP " + res.status);
+            }
+            await loadSavedContacts();
+          } catch (error) {
+            console.error("[contacts] Impossible d'enregistrer le contact", error);
+            alert(error.message || "Impossible d'ajouter ce contact.");
           }
         });
         container.appendChild(li);
@@ -316,4 +389,3 @@
       modalSettings.classList.remove("active");
       initNetwork();
     });
-

@@ -13,6 +13,30 @@
       return "http://" + hostname + ":8000";
     }
 
+    // =========================================================
+    // Mode DÉMO — source unique du préfixe API
+    // =========================================================
+    // Toutes les URL d'API du client passent par ici. Avant, le segment
+    // "/api/v1" était écrit en dur dans 7 modules : impossible de viser
+    // /api/demo/v1 sans recompiler quoi que ce soit.
+    //
+    // Bascule : localStorage.setItem("yam_demo_mode", "1") dans la
+    // console du navigateur (ou "0" pour revenir en réel). Rien d'autre,
+    // aucun build. Les réponses démobeing statiques : aucun compte réel,
+    // aucun solde, aucun paiement.
+    function isDemoMode() {
+      return localStorage.getItem("yam_demo_mode") === "1";
+    }
+
+    function apiPrefix() {
+      return isDemoMode() ? "/api/demo/v1" : "/api/v1";
+    }
+
+    // URL complète d'un endpoint de l'API, préfixe de mode inclus.
+    function apiUrl(path) {
+      return serverUrl.replace(/\/+$/, "") + apiPrefix() + path;
+    }
+
     let savedServerUrl = localStorage.getItem("yam_server_url");
     let serverUrl = savedServerUrl || getDefaultServerUrl();
     // Si l'URL stockée pointe vers un ancien hôte LAN ou un tunnel expiré, réaligner

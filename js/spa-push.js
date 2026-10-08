@@ -55,7 +55,7 @@
 
         // Enregistre le device avec le token FCM dans le backend.
         const cleanBase = serverUrl.replace(/\/+$/, "");
-        const response = await fetch(cleanBase + "/api/v1/devices/register", {
+        const response = await fetch(cleanBase + apiPrefix() + "/devices/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

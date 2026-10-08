@@ -565,6 +565,116 @@
       color: var(--text-muted);
       font-size: 0.82rem;
     }
+    .wallet-summary { display: grid; gap: 8px; }
+    .wallet-balance { font: 700 1.5rem var(--font-mono); }
+    .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .wallet-actions .card { margin-bottom: 16px; }
+    .wallet-message { min-height: 1.25rem; margin-top: 10px; font-size: .85rem; }
+    .wallet-message.error { color: var(--danger); }
+    .wallet-message.success { color: var(--accept); }
+    .wallet-field { display: grid; gap: 5px; margin-bottom: 10px; }
+    .wallet-field label { color: var(--text-muted); font-size: .78rem; font-weight: 600; }
+    .wallet-field input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
+    .wallet-transaction { align-items: flex-start; }
+    .wallet-transaction-amount { font-weight: 700; white-space: nowrap; }
+    .wallet-transaction-status { color: var(--text-muted); font-size: .75rem; }
+    .settings-devices { display: grid; gap: 8px; max-height: 180px; overflow-y: auto; }
+    .settings-device { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .settings-device-info { min-width: 0; display: grid; gap: 2px; }
+    .settings-device-meta { color: var(--text-muted); font-size: .72rem; overflow-wrap: anywhere; }
+    @media (max-width: 420px) { .wallet-actions { grid-template-columns: 1fr; } }
+
+    /* ── KondjiPro : dossier médical & facturation ─────────────────── */
+    .kpro-error-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: rgba(185,28,28,.08); color: var(--danger);
+      border: 1px solid rgba(185,28,28,.25); border-radius: var(--radius-sm);
+      padding: 10px 12px; margin-bottom: 14px; font-size: .82rem;
+    }
+    .kpro-error-banner button { flex-shrink: 0; }
+    .kpro-subnav { display: flex; gap: 8px; margin-bottom: 14px; }
+    .kpro-subnav-btn {
+      flex: 1; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-surface); color: var(--text-muted); font: 600 .82rem var(--font-ui);
+      cursor: pointer; transition: all .15s ease;
+    }
+    .kpro-subnav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .kpro-subview { display: block; }
+    .kpro-subview[hidden] { display: none; }
+    .kpro-patient-card { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .kpro-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: var(--avatar-bg); color: #fff; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: .9rem;
+    }
+    .kpro-avatar-lg { width: 54px; height: 54px; font-size: 1.1rem; }
+    .kpro-chevron { color: var(--text-muted); font-size: 1.3rem; flex-shrink: 0; }
+    .kpro-detail-top { margin-bottom: 12px; }
+    .kpro-detail-header { display: grid; gap: 12px; }
+    .kpro-detail-row { display: flex; align-items: center; gap: 12px; }
+    .kpro-badges-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .kpro-badge {
+      display: inline-block; padding: 3px 9px; border-radius: 999px;
+      font-size: .7rem; font-weight: 700;
+    }
+    .kpro-badge-primary { background: var(--accent-soft); color: var(--accent); }
+    .kpro-badge-accent { background: rgba(22,163,74,.1); color: var(--accept); }
+    .kpro-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .kpro-action-btn {
+      flex: 1; min-width: 100px; padding: 9px 10px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-main);
+      font: 600 .8rem var(--font-ui); cursor: pointer;
+    }
+    .kpro-action-btn.kpro-action-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .kpro-action-btn.kpro-action-accent { background: var(--accept); border-color: var(--accept); color: #fff; }
+    .kpro-event-card {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 12px; margin-bottom: 8px; background: var(--bg-surface);
+    }
+    .kpro-event-head { display: flex; align-items: center; gap: 10px; }
+    .kpro-event-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .kpro-event-desc { margin-top: 6px; font-size: .8rem; color: var(--text-muted); }
+    .kpro-facture-card { display: flex; align-items: center; gap: 12px; }
+    .kpro-facture-icon {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+    }
+    .kpro-icon-primary { background: var(--accent-soft); }
+    .kpro-icon-accent { background: rgba(22,163,74,.1); }
+    .kpro-facture-montant { font: 700 .9rem var(--font-mono); }
+    .kpro-actes-list { display: grid; gap: 8px; margin-bottom: 14px; }
+    .kpro-acte-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg-surface); cursor: pointer;
+    }
+    .kpro-acte-item input { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+    .kpro-acte-prix { margin-left: auto; font: 600 .82rem var(--font-mono); color: var(--accent); white-space: nowrap; }
+    .kpro-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--border); padding-top: 10px; margin-bottom: 4px;
+    }
+    .kpro-total-row strong { font: 700 1.1rem var(--font-mono); color: var(--accent); }
+    .kpro-meds-container { display: grid; gap: 10px; margin-bottom: 12px; }
+    .kpro-med-block {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 12px; background: var(--bg-surface);
+    }
+    .kpro-med-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 600; font-size: .82rem; }
+    .kpro-med-num {
+      width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft);
+      color: var(--accent); display: inline-flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700;
+    }
+    .kpro-med-remove {
+      margin-left: auto; border: none; background: transparent; color: var(--danger);
+      font-size: .9rem; cursor: pointer; padding: 2px 6px;
+    }
+    .kpro-med-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kpro-med-grid .wallet-field select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; background: var(--bg-surface); }
+    .kpro-ordonnance-card { display: flex; align-items: center; gap: 12px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
 
     /* ── Salle de réunion desktop (inspirée Meet / Zoom) ───────────── */
     :root {
@@ -941,10 +1051,176 @@
         <ul id="contacts-list" class="item-list"></ul>
       </section>
 
-      <!-- Tab 3: Historique -->
+      <!-- Tab 3: Portefeuille -->
+      <section id="tab-wallet" class="tab-pane">
+        <div class="section-title">Mon portefeuille</div>
+        <div class="card wallet-summary">
+          <span>Solde disponible</span>
+          <strong id="wallet-balance" class="wallet-balance">Chargement…</strong>
+          <span id="wallet-id" class="item-sub"></span>
+          <button id="btn-wallet-refresh" class="btn-primary" type="button">Actualiser</button>
+          <div id="wallet-load-message" class="wallet-message" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="wallet-actions">
+          <form id="wallet-recharge-form" class="card">
+            <div class="section-title">Recharger</div>
+            <div class="wallet-field">
+              <label for="wallet-recharge-amount">Montant (FCFA, minimum 100)</label>
+              <input id="wallet-recharge-amount" type="number" min="100" max="1000000" step="1" required>
+            </div>
+            <div class="wallet-field">
+              <label for="wallet-recharge-phone">Téléphone Mobile Money</label>
+              <input id="wallet-recharge-phone" type="tel" autocomplete="tel" maxlength="20" required>
+            </div>
+            <button class="btn-primary" type="submit">Continuer vers le paiement</button>
+            <div id="wallet-recharge-message" class="wallet-message" role="status" aria-live="polite"></div>
+          </form>
+
+          <form id="wallet-transfer-form" class="card">
+            <div class="section-title">Transférer</div>
+            <div class="wallet-field">
+              <label for="wallet-transfer-recipient">Téléphone ou identifiant wallet</label>
+              <input id="wallet-transfer-recipient" type="text" maxlength="32" required>
+            </div>
+            <div class="wallet-field">
+              <label for="wallet-transfer-amount">Montant (FCFA)</label>
+              <input id="wallet-transfer-amount" type="number" min="1" max="1000000" step="1" required>
+            </div>
+            <button class="btn-primary" type="submit">Envoyer</button>
+            <div id="wallet-transfer-message" class="wallet-message" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="section-title">Transactions</div>
+        <ul id="wallet-transactions" class="item-list"></ul>
+        <button id="wallet-next-page" class="btn-primary" type="button" hidden>Transactions suivantes</button>
+      </section>
+
+      <!-- Tab 4: Historique -->
       <section id="tab-history" class="tab-pane">
         <div class="section-title">Historique des Appels</div>
         <ul id="history-list" class="item-list"></ul>
+      </section>
+
+      <!-- Tab 5: Dossier médical (KondjiPro) -->
+      <section id="tab-medical" class="tab-pane">
+        <div id="kpro-session-banner" class="kpro-error-banner" hidden></div>
+        <form id="kpro-session-form" class="card" hidden>
+          <div class="section-title">Connexion médicale KondjiPro</div>
+          <div class="wallet-field">
+            <label for="kpro-session-identifier">Identifiant (téléphone, email ou nom d'utilisateur)</label>
+            <input type="text" id="kpro-session-identifier" autocomplete="username" required>
+          </div>
+          <div class="wallet-field">
+            <label for="kpro-session-password">Mot de passe</label>
+            <input type="password" id="kpro-session-password" autocomplete="current-password" required>
+          </div>
+          <button class="btn-primary" type="submit">Ouvrir la session médicale</button>
+          <div id="kpro-session-message" class="wallet-message error" role="status" aria-live="polite"></div>
+        </form>
+
+        <div id="kpro-patients-view">
+          <div class="section-title">Rechercher un patient</div>
+          <div class="card">
+            <div class="form-group">
+              <input type="text" id="kpro-patient-search" placeholder="Rechercher par nom ou téléphone...">
+            </div>
+            <ul id="kpro-patients-list" class="item-list"></ul>
+          </div>
+        </div>
+
+        <div id="kpro-patient-detail" hidden></div>
+      </section>
+
+      <!-- Tab 6: Facturation (KondjiPro) -->
+      <section id="tab-billing" class="tab-pane">
+        <div class="kpro-subnav">
+          <button type="button" class="kpro-subnav-btn active" data-kpro-sub="factures">Factures</button>
+          <button type="button" class="kpro-subnav-btn" data-kpro-sub="ordonnances">Ordonnances</button>
+          <button type="button" class="kpro-subnav-btn" data-kpro-sub="encaisser">Encaisser</button>
+        </div>
+
+        <!-- Sous-vue : Factures -->
+        <div id="kpro-sub-factures" class="kpro-subview">
+          <div class="section-title">Factures</div>
+          <ul id="kpro-factures-list" class="item-list"></ul>
+          <button id="kpro-btn-new-facture" class="btn-primary" type="button" style="margin-top:14px;">+ Nouvelle facture</button>
+        </div>
+
+        <!-- Sous-vue : Ordonnances -->
+        <div id="kpro-sub-ordonnances" class="kpro-subview" hidden>
+          <div class="section-title">Ordonnances</div>
+          <ul id="kpro-ordonnances-list" class="item-list"></ul>
+          <button id="kpro-btn-new-ordonnance" class="btn-primary" type="button" style="margin-top:14px;">+ Nouvelle ordonnance</button>
+        </div>
+
+        <!-- Sous-vue : Encaisser -->
+        <div id="kpro-sub-encaisser" class="kpro-subview" hidden>
+          <div class="section-title">Encaisser — QR KondjiPay</div>
+          <div class="card wallet-summary">
+            <span>Solde KondjiPay</span>
+            <strong id="kpro-solde" class="wallet-balance">Chargement…</strong>
+          </div>
+          <form id="kpro-form-encaisser" class="card">
+            <div class="wallet-field">
+              <label for="kpro-encaisser-phone">Numéro du patient</label>
+              <input type="tel" id="kpro-encaisser-phone" placeholder="Ex: 90 00 00 00" required>
+            </div>
+            <div class="wallet-field">
+              <label for="kpro-encaisser-montant">Montant à encaisser (FCFA)</label>
+              <input type="number" id="kpro-encaisser-montant" min="100" max="1000000" step="1" placeholder="0" required>
+            </div>
+            <div class="wallet-field">
+              <label for="kpro-encaisser-motif">Motif (optionnel)</label>
+              <input type="text" id="kpro-encaisser-motif" placeholder="Ex: Consultation, bilan ou acte médical...">
+            </div>
+            <button class="btn-primary" type="submit">Générer le QR de paiement</button>
+            <div id="kpro-encaisser-message" class="wallet-message" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <!-- Sous-vue : Formulaire facture -->
+        <div id="kpro-sub-form-facture" class="kpro-subview" hidden>
+          <div class="kpro-detail-top">
+            <button type="button" class="btn-text" data-kpro-back="factures">← Retour</button>
+          </div>
+          <form id="kpro-form-facture" class="card">
+            <div class="section-title">Créer une Facture</div>
+            <div class="wallet-field">
+              <label for="kpro-facture-phone">Numéro du patient</label>
+              <input type="tel" id="kpro-facture-phone" placeholder="Ex: 90 00 00 00" required>
+            </div>
+            <div class="section-title">Actes disponibles</div>
+            <div id="kpro-actes-list" class="kpro-actes-list"></div>
+            <div class="kpro-total-row">
+              <span>Montant Total</span>
+              <strong id="kpro-facture-total">0 FCFA</strong>
+            </div>
+            <div id="kpro-facture-count" class="item-sub" style="margin-bottom:10px;">0 sélectionné(s)</div>
+            <button class="btn-primary" type="submit">Valider la facture</button>
+            <div id="kpro-facture-message" class="wallet-message" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <!-- Sous-vue : Formulaire ordonnance -->
+        <div id="kpro-sub-form-ordonnance" class="kpro-subview" hidden>
+          <div class="kpro-detail-top">
+            <button type="button" class="btn-text" data-kpro-back="ordonnances">← Retour</button>
+          </div>
+          <form id="kpro-form-ordonnance" class="card">
+            <div class="section-title">Nouvelle Ordonnance</div>
+            <div class="wallet-field">
+              <label for="kpro-ordonnance-phone">Numéro du patient</label>
+              <input type="tel" id="kpro-ordonnance-phone" placeholder="Ex: 90 00 00 00" required>
+            </div>
+            <div class="section-title">Prescription médicale</div>
+            <div id="kpro-meds-container" class="kpro-meds-container"></div>
+            <button id="kpro-btn-add-med" class="btn-primary" type="button" style="background:var(--accent-soft); color:var(--accent); border:1px solid rgba(37,99,235,.2); margin-bottom:14px;">+ Ajouter un médicament</button>
+            <button class="btn-primary" type="submit">Valider l'ordonnance</button>
+            <div id="kpro-ordonnance-message" class="wallet-message" role="status" aria-live="polite"></div>
+          </form>
+        </div>
       </section>
     </main>
 
@@ -958,9 +1234,21 @@
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         Contacts
       </button>
+      <button class="nav-item" data-tab="tab-wallet">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2"></rect><path d="M2 10h20"></path><path d="M16 15h2"></path></svg>
+        Portefeuille
+      </button>
       <button class="nav-item" data-tab="tab-history">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         Appels
+      </button>
+      <button class="nav-item" data-tab="tab-medical">
+        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        Dossier
+      </button>
+      <button class="nav-item" data-tab="tab-billing">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Facturation
       </button>
     </nav>
 
@@ -1038,6 +1326,10 @@
           <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">MON NOM D'APPAREIL</label>
           <input type="text" id="settings-user-name" placeholder="Ex: Bureau, Ordinateur, Dam">
         </div>
+        <div>
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin:12px 0 6px;">MES APPAREILS</label>
+          <ul id="settings-devices" class="settings-devices" aria-live="polite"></ul>
+        </div>
         <div class="modal-actions">
           <button id="btn-cancel-settings" class="btn-text">Annuler</button>
           <button id="btn-save-settings" class="btn-primary" style="width:auto; padding:8px 18px;">Enregistrer</button>
@@ -1054,9 +1346,12 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/spa-core.js"></script>
   <script src="js/spa-auth.js"></script>
+  <script src="js/spa-kondjipro.js"></script>
   <script src="js/spa-network.js"></script>
   <script src="js/spa-calls.js"></script>
   <script src="js/spa-contacts.js"></script>
+  <script src="js/spa-wallet.js"></script>
+  <script src="js/spa-devices.js"></script>
   <script src="js/spa-push.js"></script>
   <script src="js/spa-bootstrap.js"></script>
 </body>

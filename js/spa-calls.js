@@ -156,7 +156,7 @@
         const ringHeaders = { "Content-Type": "application/json" };
         const ringToken = authToken();
         if (ringToken) ringHeaders["Authorization"] = `Bearer ${ringToken}`;
-        const ringRes = await fetch(cleanBase + "/api/v1/call/ring", {
+        const ringRes = await fetch(cleanBase + apiPrefix() + "/call/ring", {
           method: "POST",
           headers: ringHeaders,
           body: JSON.stringify({
@@ -345,7 +345,7 @@
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
           const res = await fetch(
-            `${cleanBase}/api/v1/call/${encodeURIComponent(currentCallId)}/offer?device_id=${encodeURIComponent(myDeviceId)}`,
+            `${cleanBase}${apiPrefix()}/call/${encodeURIComponent(currentCallId)}/offer?device_id=${encodeURIComponent(myDeviceId)}`,
             { cache: "no-store", headers: headers }
           );
           if (res.status === 200) {
@@ -602,7 +602,7 @@
       const maxAttempts = type === "bye" ? 3 : 1;
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
-          const res = await fetch(cleanBase + "/api/v1/call/signal", {
+          const res = await fetch(cleanBase + apiPrefix() + "/call/signal", {
             method: "POST",
             headers: headers,
             body: JSON.stringify(body)
@@ -635,7 +635,7 @@
         const headers = { "Content-Type": "application/json" };
         const token = authToken();
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const res = await fetch(`${cleanBase}/api/v1/call/cancel`, {
+        const res = await fetch(`${cleanBase}${apiPrefix()}/call/cancel`, {
           method: "POST",
           headers: headers,
           body: JSON.stringify({
@@ -859,7 +859,7 @@
     async function initAppel(destinationUserId) {
       const cleanBase = serverUrl.replace(/\/+$/, "");
       const fetchFn = window.fetchAuth || fetch; // wrapper auth (Bearer + 401)
-      const res = await fetchFn(cleanBase + "/api/v1/appels/init", {
+      const res = await fetchFn(cleanBase + apiPrefix() + "/appels/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ destination_user_id: destinationUserId })
@@ -893,7 +893,7 @@
       // de 500 ms) plutôt que de laisser l'appel non facturé.
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const res = await fetchFn(cleanBase + "/api/v1/appels/" + appelId + "/lancer", {
+          const res = await fetchFn(cleanBase + apiPrefix() + "/appels/" + appelId + "/lancer", {
             method: "POST",
             headers: { "Content-Type": "application/json" }
           });
@@ -918,7 +918,7 @@
       // donc la facturation démarre quand même.
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const res = await fetchFn(cleanBase + "/api/v1/appels/" + appelId + "/decrocher", {
+          const res = await fetchFn(cleanBase + apiPrefix() + "/appels/" + appelId + "/decrocher", {
             method: "POST",
             headers: { "Content-Type": "application/json" }
           });
@@ -940,7 +940,7 @@
       try {
         const cleanBase = serverUrl.replace(/\/+$/, "");
         const fetchFn = window.fetchAuth || fetch;
-        const res = await fetchFn(cleanBase + "/api/v1/appels/" + currentAppelId + "/terminer", {
+        const res = await fetchFn(cleanBase + apiPrefix() + "/appels/" + currentAppelId + "/terminer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ raison: raison })
@@ -1007,7 +1007,7 @@
       try {
         const cleanBase = serverUrl.replace(/\/+$/, "");
         const fetchFn = window.fetchAuth || fetch;
-        const res = await fetchFn(cleanBase + "/api/v1/appels/" + currentAppelId + "/heartbeat", {
+        const res = await fetchFn(cleanBase + apiPrefix() + "/appels/" + currentAppelId + "/heartbeat", {
           method: "POST",
           headers: { "Content-Type": "application/json" }
         });
@@ -1046,8 +1046,8 @@
       }
     }
 
-    // ── GET /v1/patients/{id}/solde ───────────────────────────────────
-    // Affiche la carte "Mon solde" dans l'onglet Accueil (patients uniquement).
+    // ── GET /v1/wallet ─────────────────────────────────────────────────
+    // Affiche le solde du portefeuille dans l'onglet Accueil (patients uniquement).
     async function refreshSolde() {
       const role = localStorage.getItem("user_role");
       const uid = localStorage.getItem("user_id");
@@ -1060,15 +1060,14 @@
       try {
         const cleanBase = serverUrl.replace(/\/+$/, "");
         const fetchFn = window.fetchAuth || fetch;
-        const res = await fetchFn(cleanBase + "/api/v1/patients/" + uid + "/solde");
+        const res = await fetchFn(cleanBase + apiPrefix() + "/wallet");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-        const solde = data.data?.solde;
+        const solde = data.wallet?.solde;
         card.style.display = "flex";
         const el = document.getElementById("solde-amount");
-        if (el) el.textContent = (solde != null ? solde : "—") + " F";
+        if (el) el.textContent = solde || "—";
       } catch (err) {
         console.warn("[YAM] Solde indisponible:", err);
       }
     }
-

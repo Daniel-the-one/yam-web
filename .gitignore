@@ -8,6 +8,10 @@
 *.ipa
 *.dSYM.zip
 
+# Artefacts de déploiement / backups de désactivation
+kondjipro/
+*.off
+
 # Configuration locale
 .env
 .env.*

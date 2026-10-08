@@ -4,6 +4,7 @@
       if (isAuthValid) {
         updateIdentityUI();
         renderContacts();
+        loadSavedContacts();
         renderHistory();
         initNetwork();
         registerWebPush();

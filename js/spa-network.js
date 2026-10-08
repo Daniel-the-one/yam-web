@@ -4,7 +4,7 @@
       setStatus("connecting");
       try {
         const cleanBase = serverUrl.replace(/\/+$/, "");
-        const cfgRes = await fetch(cleanBase + "/api/v1/config").catch(() => null);
+        const cfgRes = await fetch(cleanBase + apiPrefix() + "/config").catch(() => null);
         let appKey = "local";
         let cluster = "eu";
 
